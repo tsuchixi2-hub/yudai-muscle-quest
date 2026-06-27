@@ -1,0 +1,1183 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121416">
+  <title>YUDAI Muscle Quest</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink:#151719;
+      --muted:#6f757c;
+      --paper:#f5f6f7;
+      --panel:#ffffff;
+      --line:#dfe3e6;
+      --coal:#202428;
+      --red:#d63838;
+      --red-soft:#ffe7e7;
+      --blue:#2278b8;
+      --green:#16885b;
+      --yellow:#e0a51e;
+      --shadow:0 10px 24px rgba(21,23,25,.08);
+    }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      margin:0;
+      color:var(--ink);
+      background:linear-gradient(180deg,#eceff1 0,#f7f7f5 320px,var(--paper) 100%);
+      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Segoe UI",sans-serif;
+      -webkit-tap-highlight-color:transparent;
+    }
+    button,input,select,textarea { font:inherit; }
+    button { cursor:pointer; }
+    a { color:inherit; }
+    .app { width:min(1180px,100%); margin:0 auto; padding:0 18px 104px; }
+    .topbar {
+      position:sticky;
+      z-index:20;
+      top:0;
+      margin:0 -18px;
+      padding:max(12px,env(safe-area-inset-top)) 18px 11px;
+      border-bottom:1px solid rgba(223,227,230,.86);
+      background:rgba(245,246,247,.92);
+      backdrop-filter:blur(18px);
+    }
+    .topbar-inner { max-width:1144px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:14px; }
+    .brand { min-width:0; display:flex; align-items:center; gap:10px; }
+    .brand-mark {
+      width:40px;
+      height:40px;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      border-radius:8px;
+      color:#fff;
+      background:linear-gradient(145deg,#111,#383d42);
+      font-weight:900;
+    }
+    .brand strong { display:block; font-size:15px; line-height:1.1; }
+    .brand span { display:block; margin-top:4px; color:var(--muted); font-size:10px; font-weight:800; }
+    .top-actions { display:flex; align-items:center; gap:8px; }
+    .icon-btn {
+      width:40px;
+      height:40px;
+      display:grid;
+      place-items:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      font-weight:900;
+    }
+    .primary-btn {
+      min-height:40px;
+      padding:0 14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:0;
+      border-radius:8px;
+      color:#fff;
+      background:var(--red);
+      font-size:12px;
+      font-weight:900;
+      text-decoration:none;
+    }
+    .trainer-banner {
+      margin-top:18px;
+      min-height:96px;
+      display:grid;
+      grid-template-columns:58px minmax(0,1fr) auto;
+      gap:13px;
+      align-items:center;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      box-shadow:var(--shadow);
+    }
+    .trainer-avatar {
+      width:58px;
+      height:58px;
+      display:grid;
+      place-items:center;
+      border-radius:8px;
+      color:#fff;
+      background:linear-gradient(145deg,#111,#3f464d);
+      font-size:22px;
+      font-weight:900;
+    }
+    .trainer-copy span { color:var(--red); font-size:10px; font-weight:900; }
+    .trainer-copy strong { display:block; margin-top:4px; color:var(--coal); font-size:17px; line-height:1.35; }
+    .trainer-copy p { margin:5px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
+    .trainer-status {
+      min-height:38px;
+      padding:0 12px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      color:#fff;
+      background:var(--green);
+      font-size:11px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .trainer-banner.warning .trainer-status { background:var(--yellow); color:#111; }
+    .trainer-banner.danger .trainer-status { background:var(--red); }
+    .shell { display:grid; grid-template-columns:minmax(0,1fr) 338px; gap:18px; align-items:start; padding-top:18px; }
+    .main { display:grid; gap:16px; min-width:0; }
+    .side { display:grid; gap:16px; min-width:0; }
+    .hero {
+      min-height:292px;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 310px;
+      gap:18px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#111;
+      box-shadow:var(--shadow);
+    }
+    .hero-copy { padding:24px; color:#fff; display:flex; flex-direction:column; justify-content:space-between; gap:18px; }
+    .kicker { display:inline-flex; align-items:center; gap:8px; color:#ffb3b3; font-size:11px; font-weight:900; }
+    h1 { margin:7px 0 0; max-width:560px; font-size:42px; line-height:1.06; letter-spacing:0; }
+    .hero-copy p { margin:10px 0 0; max-width:520px; color:#d5d8dc; font-size:13px; line-height:1.75; }
+    .hero-metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .hero-metric { min-height:72px; padding:11px; border:1px solid rgba(255,255,255,.16); border-radius:8px; background:rgba(255,255,255,.07); }
+    .hero-metric span { display:block; color:#aeb5bc; font-size:10px; font-weight:800; }
+    .hero-metric strong { display:block; margin-top:6px; color:#fff; font-size:20px; }
+    .muscle-visual {
+      position:relative;
+      min-height:292px;
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.68)),
+        url("https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=900&q=80") center / cover;
+    }
+    .muscle-visual::after {
+      content:"";
+      position:absolute;
+      inset:auto 16px 16px;
+      height:92px;
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:8px;
+      background:rgba(0,0,0,.46);
+      backdrop-filter:blur(8px);
+    }
+    .photo-note { position:absolute; z-index:1; right:30px; bottom:30px; left:30px; color:#fff; }
+    .photo-note span { display:block; color:#ffcccc; font-size:10px; font-weight:900; }
+    .photo-note strong { display:block; margin-top:5px; font-size:15px; line-height:1.35; }
+    .hero,
+    .panel,
+    .hero-copy,
+    .muscle-visual {
+      min-width:0;
+    }
+    .panel {
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:rgba(255,255,255,.96);
+      box-shadow:var(--shadow);
+    }
+    .panel-head {
+      min-height:58px;
+      padding:14px 16px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid var(--line);
+    }
+    .panel-head h2 { margin:0; color:var(--coal); font-size:17px; line-height:1.25; }
+    .panel-head p { margin:4px 0 0; color:var(--muted); font-size:10px; line-height:1.45; }
+    .pill { flex:0 0 auto; padding:6px 9px; border-radius:999px; color:var(--red); background:var(--red-soft); font-size:10px; font-weight:900; }
+    .panel-body { padding:16px; }
+    .week-grid { width:100%; min-width:0; display:grid; grid-template-columns:repeat(7,1fr); gap:7px; }
+    .day {
+      min-height:82px;
+      padding:9px 6px;
+      display:grid;
+      grid-template-rows:auto 1fr auto;
+      justify-items:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fafafa;
+      text-align:center;
+    }
+    .day span { color:var(--muted); font-size:9px; font-weight:900; }
+    .day strong { display:grid; place-items:center; width:32px; height:32px; margin-top:6px; border-radius:50%; color:#9aa1a8; background:#eceff1; font-size:15px; }
+    .day em { color:var(--muted); font-size:9px; font-style:normal; font-weight:800; }
+    .day.done { border-color:#f0b1b1; background:#fff5f5; }
+    .day.done strong { color:#fff; background:var(--red); }
+    .progress-line { height:10px; margin:14px 0 8px; overflow:hidden; border-radius:99px; background:#e7eaed; }
+    .progress-line span { display:block; height:100%; width:0; border-radius:inherit; background:linear-gradient(90deg,var(--red),var(--yellow),var(--green)); transition:width .2s ease; }
+    .week-summary { display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--muted); font-size:11px; font-weight:900; }
+    .exercise-form { display:grid; grid-template-columns:1fr 1fr 1fr 1fr auto; gap:8px; align-items:end; }
+    .field { min-width:0; display:grid; gap:5px; }
+    .field label { color:var(--muted); font-size:10px; font-weight:900; }
+    .field input,.field select {
+      width:100%;
+      min-height:42px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:0 10px;
+      color:var(--coal);
+      background:#fff;
+      font-weight:800;
+    }
+    .field input[type="number"] { text-align:right; }
+    .save-btn {
+      min-height:42px;
+      padding:0 13px;
+      border:0;
+      border-radius:8px;
+      color:#fff;
+      background:var(--coal);
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .tabs { display:flex; gap:6px; padding:4px; border-radius:8px; background:#edf0f2; overflow:auto; }
+    .tabs button {
+      min-height:34px;
+      padding:0 11px;
+      border:0;
+      border-radius:6px;
+      color:var(--muted);
+      background:transparent;
+      font-size:11px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .tabs button.active { color:#fff; background:var(--coal); }
+    .records { display:grid; gap:8px; margin-top:12px; }
+    .record {
+      min-height:74px;
+      display:grid;
+      grid-template-columns:46px minmax(0,1fr) auto;
+      gap:10px;
+      align-items:center;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+    }
+    .muscle-icon { width:46px; height:46px; display:grid; place-items:center; border-radius:8px; color:#fff; background:var(--coal); font-weight:900; }
+    .record strong { display:block; color:var(--coal); font-size:14px; }
+    .record small { display:block; margin-top:4px; color:var(--muted); font-size:10px; line-height:1.45; }
+    .gain { min-width:98px; text-align:right; color:var(--green); font-size:11px; font-weight:900; }
+    .gain.flat { color:var(--muted); }
+    .gain.best { color:var(--red); }
+    .quote {
+      min-height:256px;
+      color:#fff;
+      background:
+        linear-gradient(180deg,rgba(18,20,22,.1),rgba(18,20,22,.82)),
+        url("https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=850&q=80") center / cover;
+      overflow:hidden;
+    }
+    .quote .panel-body { min-height:255px; display:flex; flex-direction:column; justify-content:flex-end; }
+    .quote h2 { margin:0; color:#fff; font-size:16px; }
+    .quote blockquote { margin:9px 0 0; font-family:Georgia,"Yu Mincho",serif; font-size:20px; line-height:1.55; }
+    .quote p { margin:9px 0 0; color:#d7dde1; font-size:11px; line-height:1.6; }
+    .level-box { display:grid; grid-template-columns:96px minmax(0,1fr); gap:14px; align-items:center; }
+    .level-ring {
+      width:96px;
+      height:96px;
+      display:grid;
+      place-items:center;
+      border-radius:50%;
+      background:conic-gradient(var(--red) 0deg,#e6eaee 0);
+      position:relative;
+    }
+    .level-ring::after { content:""; position:absolute; inset:8px; border-radius:50%; background:#fff; }
+    .level-ring strong { position:relative; z-index:1; font-size:21px; }
+    .level-info span { color:var(--muted); font-size:10px; font-weight:900; }
+    .level-info h3 { margin:5px 0 0; color:var(--coal); font-size:21px; }
+    .level-info p { margin:7px 0 0; color:var(--muted); font-size:11px; line-height:1.55; }
+    .level-link {
+      min-height:36px;
+      margin-top:11px;
+      padding:0 11px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      text-decoration:none;
+      font-size:11px;
+      font-weight:900;
+    }
+    .body-map { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+    .body-part {
+      min-height:78px;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fafafa;
+    }
+    .body-part span { display:block; color:var(--muted); font-size:9px; font-weight:900; }
+    .body-part strong { display:block; margin-top:5px; color:var(--coal); font-size:15px; }
+    .body-part em { display:block; margin-top:5px; color:var(--blue); font-size:10px; font-style:normal; font-weight:900; }
+    .chart-shell { display:grid; gap:12px; }
+    .chart-mode {
+      display:flex;
+      gap:6px;
+      padding:4px;
+      border-radius:8px;
+      background:#edf0f2;
+      overflow:auto;
+    }
+    .chart-mode button {
+      min-height:34px;
+      min-width:66px;
+      padding:0 12px;
+      border:0;
+      border-radius:6px;
+      color:var(--muted);
+      background:transparent;
+      font-size:11px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .chart-mode button.active { color:#fff; background:var(--red); }
+    .chart-frame {
+      min-height:306px;
+      padding:10px 4px 2px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fafafa;
+    }
+    .chart-frame svg { display:block; width:100%; height:auto; min-height:280px; }
+    .chart-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .chart-card {
+      min-height:72px;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+    }
+    .chart-card span { display:block; color:var(--muted); font-size:9px; font-weight:900; }
+    .chart-card strong { display:block; margin-top:5px; color:var(--coal); font-size:15px; }
+    .chart-card em { display:block; margin-top:5px; color:var(--red); font-size:10px; font-style:normal; font-weight:900; }
+    .report { white-space:pre-wrap; color:var(--coal); font-size:12px; line-height:1.75; }
+    .photo-section { margin-top:18px; border:1px solid var(--line); border-radius:8px; background:#111; box-shadow:var(--shadow); overflow:hidden; }
+    .photo-head {
+      min-height:64px;
+      padding:16px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      color:#fff;
+      border-bottom:1px solid rgba(255,255,255,.14);
+    }
+    .photo-head h2 { margin:0; font-size:18px; }
+    .photo-head p { margin:4px 0 0; color:#b8bec4; font-size:10px; line-height:1.5; }
+    .slider-actions { display:flex; gap:8px; }
+    .photo-record-link {
+      min-height:40px;
+      padding:0 12px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:8px;
+      color:#fff;
+      background:rgba(255,255,255,.09);
+      text-decoration:none;
+      font-size:11px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .slider-actions button {
+      width:40px;
+      height:40px;
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:8px;
+      color:#fff;
+      background:rgba(255,255,255,.09);
+      font-size:18px;
+      font-weight:900;
+    }
+    .photo-stage {
+      position:relative;
+      min-height:420px;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 330px;
+      background:#111;
+    }
+    .photo-stage img { width:100%; height:420px; display:block; object-fit:cover; }
+    .photo-copy {
+      padding:22px;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      color:#fff;
+      background:linear-gradient(180deg,#202428,#111);
+    }
+    .photo-copy span { color:#ffb3b3; font-size:10px; font-weight:900; }
+    .photo-copy strong { display:block; margin-top:8px; font-size:26px; line-height:1.15; }
+    .photo-copy p { margin:10px 0 0; color:#cfd5da; font-size:12px; line-height:1.7; }
+    .photo-copy a { margin-top:12px; color:#fff; font-size:10px; font-weight:900; text-underline-offset:3px; }
+    .thumb-row {
+      padding:10px;
+      display:grid;
+      grid-template-columns:repeat(10,1fr);
+      gap:7px;
+      background:#16191c;
+      overflow:auto;
+    }
+    .thumb-row button {
+      min-width:76px;
+      aspect-ratio:1.4;
+      overflow:hidden;
+      padding:0;
+      border:2px solid transparent;
+      border-radius:6px;
+      background:#333;
+    }
+    .thumb-row button.active { border-color:var(--red); }
+    .thumb-row img { width:100%; height:100%; object-fit:cover; display:block; }
+    .bottom-nav {
+      position:fixed;
+      z-index:30;
+      right:0;
+      bottom:0;
+      left:0;
+      padding:8px 14px max(8px,env(safe-area-inset-bottom));
+      border-top:1px solid var(--line);
+      background:rgba(255,255,255,.95);
+      backdrop-filter:blur(18px);
+    }
+    .bottom-nav-inner { max-width:560px; margin:0 auto; display:grid; grid-template-columns:repeat(5,1fr); gap:5px; }
+    .bottom-nav a { min-height:48px; display:grid; place-items:center; border-radius:8px; color:var(--muted); text-decoration:none; font-size:18px; font-weight:900; }
+    .bottom-nav a.active { color:#fff; background:var(--coal); }
+    .toast {
+      position:fixed;
+      z-index:40;
+      right:18px;
+      bottom:86px;
+      left:18px;
+      max-width:420px;
+      margin:auto;
+      padding:12px 14px;
+      border-radius:8px;
+      color:#fff;
+      background:rgba(21,23,25,.94);
+      text-align:center;
+      font-size:12px;
+      font-weight:900;
+      opacity:0;
+      transform:translateY(10px);
+      pointer-events:none;
+      transition:.18s ease;
+    }
+    .toast.show { opacity:1; transform:none; }
+    @media (max-width:920px) {
+      .shell { grid-template-columns:1fr; }
+      .side { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .quote { grid-column:1/-1; }
+      .hero { grid-template-columns:1fr; }
+      .muscle-visual { min-height:210px; }
+      .exercise-form { grid-template-columns:1fr 1fr; }
+      .save-btn { grid-column:1/-1; }
+      .chart-cards { grid-template-columns:repeat(2,1fr); }
+      .photo-stage { grid-template-columns:1fr; }
+      .photo-stage img { height:330px; }
+    }
+    @media (max-width:620px) {
+      .app { padding-inline:12px; }
+      .topbar { margin-inline:-12px; padding-inline:12px; }
+      h1 { font-size:31px; }
+      .hero-copy { padding:18px; }
+      .hero-metrics,.week-grid,.side { grid-template-columns:1fr; }
+      .trainer-banner { grid-template-columns:48px minmax(0,1fr); }
+      .trainer-avatar { width:48px; height:48px; font-size:18px; }
+      .trainer-status { grid-column:1/-1; width:100%; }
+      .week-grid { grid-template-columns:repeat(7,64px); max-width:100%; overflow:auto; padding-bottom:4px; }
+      .exercise-form { grid-template-columns:1fr; }
+      .record { grid-template-columns:40px minmax(0,1fr); }
+      .gain { grid-column:2; text-align:left; }
+      .body-map { grid-template-columns:1fr; }
+      .top-actions .primary-btn { display:none; }
+      .chart-cards { grid-template-columns:1fr; }
+      .photo-head { flex-direction:column; }
+      .slider-actions { width:100%; justify-content:space-between; }
+      .photo-stage img { height:280px; }
+      .photo-copy strong { font-size:22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-mark">YM</div>
+          <div>
+            <strong>YUDAI Muscle Quest</strong>
+            <span>兄・優大の筋トレ習慣化</span>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button class="icon-btn" type="button" id="resetBtn" title="サンプルに戻す">↺</button>
+          <a class="primary-btn" href="photos.html">写真記録</a>
+          <button class="primary-btn" type="button" id="quickAddBtn">今日の筋トレ</button>
+        </div>
+      </div>
+    </header>
+
+    <section class="trainer-banner" id="trainerBanner" aria-live="polite">
+      <div class="trainer-avatar">T</div>
+      <div class="trainer-copy">
+        <span id="trainerKicker">TRAINER MESSAGE</span>
+        <strong id="trainerTitle">今日の調子を確認中</strong>
+        <p id="trainerText">記録に合わせて、トレーナーから一言が入ります。</p>
+      </div>
+      <div class="trainer-status" id="trainerStatus">確認中</div>
+    </section>
+
+    <div class="shell">
+      <main class="main">
+        <section class="hero" id="home">
+          <div class="hero-copy">
+            <div>
+              <span class="kicker">WEEKLY MUSCLE QUEST</span>
+              <h1>週3回、強くなる記録を積み上げる。</h1>
+              <p>重量・回数・部位の伸びを見える化して、前回の自分に勝った瞬間をポイントに変える筋トレ習慣アプリ。</p>
+            </div>
+            <div class="hero-metrics">
+              <div class="hero-metric"><span>今週</span><strong id="heroWeek">0 / 3</strong></div>
+              <div class="hero-metric"><span>ポイント</span><strong id="heroPoints">0 pt</strong></div>
+              <div class="hero-metric"><span>自己ベスト</span><strong id="heroBest">0</strong></div>
+            </div>
+          </div>
+          <div class="muscle-visual">
+            <div class="photo-note">
+              <span>今週の筋肉</span>
+              <strong>背中の厚みは、続けた日の数で作られる。</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="week">
+          <div class="panel-head">
+            <div>
+              <h2>週3チャレンジ</h2>
+              <p>筋トレ実行日を週単位で集計</p>
+            </div>
+            <span class="pill" id="weekPill">あと3回</span>
+          </div>
+          <div class="panel-body">
+            <div class="week-grid" id="weekGrid"></div>
+            <div class="progress-line"><span id="weekFill"></span></div>
+            <div class="week-summary"><span id="weekText">今週 0 回</span><span id="weekBonus">週3達成で +30pt</span></div>
+          </div>
+        </section>
+
+        <section class="panel" id="record">
+          <div class="panel-head">
+            <div>
+              <h2>トレーニング記録</h2>
+              <p>部位・種目・重量・回数を入力</p>
+            </div>
+            <span class="pill">+10pt / 回</span>
+          </div>
+          <div class="panel-body">
+            <form class="exercise-form" id="logForm">
+              <div class="field">
+                <label for="partInput">部位</label>
+                <select id="partInput">
+                  <option>胸</option>
+                  <option>背中</option>
+                  <option>肩</option>
+                  <option>腕</option>
+                  <option>脚</option>
+                  <option>腹</option>
+                  <option>全身</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="exerciseInput">種目</label>
+                <input id="exerciseInput" list="exerciseList" value="ベンチプレス">
+                <datalist id="exerciseList"></datalist>
+              </div>
+              <div class="field">
+                <label for="weightInput">重量 kg</label>
+                <input id="weightInput" type="number" min="0" max="400" step="0.5" value="60">
+              </div>
+              <div class="field">
+                <label for="repsInput">回数</label>
+                <input id="repsInput" type="number" min="1" max="200" step="1" value="8">
+              </div>
+              <button class="save-btn" type="submit">保存</button>
+            </form>
+          </div>
+        </section>
+
+        <section class="panel" id="growth">
+          <div class="panel-head">
+            <div>
+              <h2>部位別の成長</h2>
+              <p>前回比と自己ベストを表示</p>
+            </div>
+            <span class="pill" id="growthPill">胸</span>
+          </div>
+          <div class="panel-body">
+            <div class="tabs" id="partTabs"></div>
+            <div class="records" id="records"></div>
+          </div>
+        </section>
+
+        <section class="panel" id="chart">
+          <div class="panel-head">
+            <div>
+              <h2>部位別成長グラフ</h2>
+              <p id="chartCaption">今週の合計ボリュームと前回超えをまとめて確認</p>
+            </div>
+            <span class="pill" id="chartPill">週</span>
+          </div>
+          <div class="panel-body">
+            <div class="chart-shell">
+              <div class="chart-mode" id="chartMode" aria-label="グラフ期間">
+                <button type="button" data-chart-mode="day">日</button>
+                <button type="button" data-chart-mode="week">週</button>
+                <button type="button" data-chart-mode="month">月</button>
+              </div>
+              <div class="chart-frame">
+                <svg id="partChart" viewBox="0 0 760 300" role="img" aria-label="部位別トレーニング成長グラフ"></svg>
+              </div>
+              <div class="chart-cards" id="chartCards"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <aside class="side">
+        <section class="panel quote" id="muscle">
+          <div class="panel-body">
+            <h2>今週の筋肉</h2>
+            <blockquote>「筋肉は裏切らない。記録はもっと裏切らない。」</blockquote>
+            <p>今週は背中。懸垂・ローイング・デッドリフト系を1回でも入れると、厚みづくりにポイント加算。</p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>レベル</h2>
+              <p>継続と成長でランクアップ</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="level-box">
+              <div class="level-ring" id="levelRing"><strong id="levelText">Lv.1</strong></div>
+              <div class="level-info">
+                <span id="levelSub">0 / 120 pt</span>
+                <h3 id="levelName">フォーム見習い</h3>
+                <p id="levelMessage">今日の1セットが、次のレベルの材料になる。</p>
+                <a class="level-link" href="levels.html">ポイント・レベル表を見る</a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>部位バランス</h2>
+              <p>今週の偏りを確認</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="body-map" id="bodyMap"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>週間レポート</h2>
+              <p>LINE共有用の要約</p>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="report" id="report"></div>
+          </div>
+        </section>
+      </aside>
+    </div>
+
+    <section class="photo-section" id="photos">
+      <div class="photo-head">
+        <div>
+          <h2>Muscle Photo Slider</h2>
+          <p>Webから選んだ筋トレ写真を10枚表示。正式版ではお気に入り登録や今週の筋肉への採用もできます。</p>
+        </div>
+        <div class="slider-actions">
+          <a class="photo-record-link" href="photos.html">自分の写真を記録</a>
+          <button type="button" id="prevPhoto" aria-label="前の写真">‹</button>
+          <button type="button" id="nextPhoto" aria-label="次の写真">›</button>
+        </div>
+      </div>
+      <div class="photo-stage">
+        <img id="photoMain" src="" alt="">
+        <div class="photo-copy">
+          <span id="photoCount">1 / 10</span>
+          <strong id="photoTitle">Back Power</strong>
+          <p id="photoNote">背中・肩・腕の厚みをイメージする写真。</p>
+          <a id="photoCredit" href="#" target="_blank" rel="noreferrer">Unsplashで出典を見る</a>
+        </div>
+      </div>
+      <div class="thumb-row" id="photoThumbs"></div>
+    </section>
+  </div>
+
+  <nav class="bottom-nav" aria-label="画面移動">
+    <div class="bottom-nav-inner">
+      <a class="active" href="#home" title="ホーム">⌂</a>
+      <a href="#week" title="週">▦</a>
+      <a href="#record" title="記録">＋</a>
+      <a href="#growth" title="成長">↗</a>
+      <a href="#photos" title="写真">◆</a>
+    </div>
+  </nav>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (() => {
+      const parts = ["胸","背中","肩","腕","脚","腹","全身"];
+      const levels = [
+        { level:1, points:0, name:"フォーム見習い" },
+        { level:2, points:120, name:"週3チャレンジャー" },
+        { level:3, points:260, name:"継続ビルダー" },
+        { level:4, points:420, name:"重量ハンター" },
+        { level:5, points:620, name:"筋肉クエスト王" }
+      ];
+      const musclePhotos = [
+        {
+          title:"Dumbbell Focus",
+          note:"腕・肩の集中力を上げたい日に見る写真。",
+          author:"Luke Witter",
+          source:"https://unsplash.com/ja/%E5%86%99%E7%9C%9F/%E3%82%B8%E3%83%A0%E3%81%A7%E3%83%80%E3%83%B3%E3%83%99%E3%83%AB%E3%82%92%E6%8C%81%E3%81%A3%E3%81%A6%E3%81%84%E3%82%8B%E7%94%B7-k47w6BeapCs",
+          img:"https://images.unsplash.com/photo-1641337221253-fdc7237f6b61?auto=format&fit=crop&w=1200&q=80"
+        },
+        {
+          title:"Squat Day",
+          note:"脚の日。重さに向き合う空気を作る一枚。",
+          author:"Kobe Kian Clata",
+          source:"https://unsplash.com/photos/a-man-doing-a-back-squat-in-a-gym-z37-BugFEAk",
+          img:"https://images.unsplash.com/photo-1730167573980-35adcd6d9e4f?auto=format&fit=crop&w=1200&q=80"
+        },
+        {
+          title:"Back Thickness",
+          note:"背中の厚みは、引く種目の積み重ねで作る。",
+          author:"Unsplash",
+          source:"https://unsplash.com/s/photos/muscular-gym",
+          img:"https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?auto=format&fit=crop&w=1200&q=80"
+        },
+        {
+          title:"Rope Power",
+          note:"全身を使うトレーニングの迫力を感じる写真。",
+          author:"Unsplash",
+          source:"https://unsplash.com/s/photos/fitness-workout",
+          img:"https://images.unsplash.com/photo-1605296867304-46d5465a13f1?auto=format&fit=crop&w=1200&q=80"
+        },
+        {
+          title:"Battle Rope",
+          note:"短時間でも心拍を上げる全身トレのイメージ。",
+          author:"Unsplash",
+          source:"https://unsplash.com/s/photos/battle-rope-gym",
+          img:"https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1200&q=80"
+        },
+        {
+          title:"Bodyweight Control",
+          note:"自重トレでも十分にかっこよく強くなれる。",
+          author:"Unsplash",
+          source:"https://unsplash.com/s/photos/calisthenics-fitness",
+          img:"https://images.unsplash.com/photo-1574680096145-d05b474e2155?auto=format&fit=crop&w=1200&q=80"
+        },
+        {
+          title:"Training Room",
+          note:"今日の1セットを始めるためのジム感。",
+          author:"Unsplash",
+          source:"https://unsplash.com/s/photos/bodybuilding-gym",
+          img:"https://images.unsplash.com/photo-1599058917212-d750089bc07e?auto=format&fit=crop&w=1200&q=80"
+        },
+        {
+          title:"Iron Mood",
+          note:"ウェイトを握るだけでスイッチが入る一枚。",
+          author:"Unsplash",
+          source:"https://unsplash.com/s/photos/weightlifting",
+          img:"https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80"
+        },
+        {
+          title:"Gym Energy",
+          note:"迷ったらまず動く。1種目だけでも勝ち。",
+          author:"Unsplash",
+          source:"https://unsplash.com/s/photos/gym-training",
+          img:"https://images.unsplash.com/photo-1605296867424-35fc25c9212a?auto=format&fit=crop&w=1200&q=80"
+        },
+        {
+          title:"Barbell Focus",
+          note:"フォームを整えて、前回より少しだけ強く。",
+          author:"Unsplash",
+          source:"https://unsplash.com/s/photos/barbell-workout",
+          img:"https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1200&q=80"
+        }
+      ];
+      const sampleLogs = [
+        { date:"2026-06-02", part:"胸", exercise:"ベンチプレス", weight:50, reps:8, sets:3 },
+        { date:"2026-06-03", part:"背中", exercise:"ラットプルダウン", weight:37.5, reps:10, sets:3 },
+        { date:"2026-06-06", part:"脚", exercise:"スクワット", weight:62.5, reps:6, sets:3 },
+        { date:"2026-06-10", part:"肩", exercise:"ショルダープレス", weight:22.5, reps:8, sets:3 },
+        { date:"2026-06-12", part:"胸", exercise:"ベンチプレス", weight:52.5, reps:8, sets:3 },
+        { date:"2026-06-14", part:"腕", exercise:"ダンベルカール", weight:10, reps:10, sets:3 },
+        { date:"2026-06-16", part:"背中", exercise:"ラットプルダウン", weight:40, reps:10, sets:3 },
+        { date:"2026-06-18", part:"脚", exercise:"スクワット", weight:67.5, reps:6, sets:3 },
+        { date:"2026-06-22", part:"胸", exercise:"ベンチプレス", weight:55, reps:8, sets:3 },
+        { date:"2026-06-22", part:"腕", exercise:"ダンベルカール", weight:12, reps:10, sets:3 },
+        { date:"2026-06-24", part:"背中", exercise:"ラットプルダウン", weight:42.5, reps:10, sets:3 },
+        { date:"2026-06-24", part:"脚", exercise:"スクワット", weight:70, reps:6, sets:3 },
+        { date:"2026-06-25", part:"胸", exercise:"ベンチプレス", weight:60, reps:8, sets:3 },
+        { date:"2026-06-25", part:"腹", exercise:"クランチ", weight:0, reps:25, sets:3 }
+      ];
+      const state = { logs:[...sampleLogs], selectedPart:"胸", activePhoto:0, chartMode:"week" };
+      const today = "2026-06-25";
+      const $ = id => document.getElementById(id);
+      const fmt = n => Number(n).toLocaleString("ja-JP");
+      function weekDates() {
+        return ["2026-06-22","2026-06-23","2026-06-24","2026-06-25","2026-06-26","2026-06-27","2026-06-28"];
+      }
+      function labelDate(date) {
+        const names = ["月","火","水","木","金","土","日"];
+        return names[weekDates().indexOf(date)] || "";
+      }
+      function dayLogs(date) {
+        return state.logs.filter(log => log.date === date);
+      }
+      function rangeForChart() {
+        if (state.chartMode === "day") {
+          return {
+            label:"日",
+            start:today,
+            end:today,
+            caption:"今日の部位別ボリュームと前回超えを確認"
+          };
+        }
+        if (state.chartMode === "month") {
+          return {
+            label:"月",
+            start:"2026-06-01",
+            end:"2026-06-30",
+            caption:"今月の部位別ボリュームと伸びをまとめて確認"
+          };
+        }
+        const days = weekDates();
+        return {
+          label:"週",
+          start:days[0],
+          end:days[days.length - 1],
+          caption:"今週の合計ボリュームと前回超えをまとめて確認"
+        };
+      }
+      function logsInRange(start, end) {
+        return state.logs.filter(log => log.date >= start && log.date <= end);
+      }
+      function workoutDays() {
+        return weekDates().filter(date => dayLogs(date).length);
+      }
+      function tonnage(log) {
+        return Number(log.weight) * Number(log.reps) * Number(log.sets || 1);
+      }
+      function previousFor(log, index) {
+        const past = state.logs.slice(0,index).filter(item => item.exercise === log.exercise);
+        return past.at(-1) || null;
+      }
+      function bestFor(exercise) {
+        return Math.max(...state.logs.filter(log => log.exercise === exercise).map(log => tonnage(log)), 0);
+      }
+      function partStats(range = rangeForChart()) {
+        return parts.map(part => {
+          const logs = logsInRange(range.start, range.end).filter(log => log.part === part);
+          const volume = logs.reduce((sum,log) => sum + tonnage(log), 0);
+          const improved = logs.filter(log => {
+            const index = state.logs.indexOf(log);
+            const prev = previousFor(log,index);
+            return prev && (Number(log.weight) > Number(prev.weight) || Number(log.reps) > Number(prev.reps));
+          }).length;
+          const best = logs.reduce((top,log) => Math.max(top, tonnage(log)), 0);
+          return { part, logs, volume, improved, best };
+        });
+      }
+      function points() {
+        let total = state.logs.length * 10;
+        if (workoutDays().length >= 3) total += 30;
+        state.logs.forEach((log,index) => {
+          const prev = previousFor(log,index);
+          if (!prev) return;
+          if (Number(log.weight) > Number(prev.weight)) total += 8;
+          if (Number(log.reps) > Number(prev.reps)) total += 5;
+        });
+        total += new Set(state.logs.map(log => log.exercise)).size * 3;
+        return total;
+      }
+      function currentLevel() {
+        const p = points();
+        let result = levels[0];
+        levels.forEach(level => { if (p >= level.points) result = level; });
+        const next = levels.find(level => level.points > p) || null;
+        return { current:result, next, points:p };
+      }
+      function toast(text) {
+        const el = $("toast");
+        el.textContent = text;
+        el.classList.add("show");
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => el.classList.remove("show"), 1800);
+      }
+      function renderWeek() {
+        const done = workoutDays();
+        $("weekGrid").innerHTML = weekDates().map(date => {
+          const logs = dayLogs(date);
+          const isDone = logs.length > 0;
+          const label = date === today ? "今日" : labelDate(date);
+          return `<div class="day ${isDone ? "done" : ""}"><span>${label}</span><strong>${isDone ? "✓" : "·"}</strong><em>${logs.length ? `${logs.length}種目` : date.slice(8)}</em></div>`;
+        }).join("");
+        const count = done.length;
+        $("weekFill").style.width = Math.min(100, count / 3 * 100) + "%";
+        $("weekText").textContent = `今週 ${count} 回`;
+        $("weekPill").textContent = count >= 3 ? "達成済み" : `あと${3 - count}回`;
+        $("weekBonus").textContent = count >= 3 ? "週3ボーナス +30pt 獲得" : "週3達成で +30pt";
+        $("heroWeek").textContent = `${count} / 3`;
+      }
+      function dateDiffDays(later, earlier) {
+        const oneDay = 24 * 60 * 60 * 1000;
+        return Math.round((new Date(`${later}T00:00:00`) - new Date(`${earlier}T00:00:00`)) / oneDay);
+      }
+      function renderTrainerMessage() {
+        const count = workoutDays().length;
+        const latest = [...state.logs].sort((a,b) => b.date.localeCompare(a.date))[0];
+        const gap = latest ? dateDiffDays(today, latest.date) : 99;
+        const banner = $("trainerBanner");
+        let mood = "";
+        let status = "順調";
+        let title = "週3ペース、かなりいい流れ。";
+        let text = "今週はもう習慣の土台ができています。次は重量か回数を1つだけ伸ばして、前回の自分に勝とう。";
+        if (count >= 3) {
+          mood = "";
+        } else if (count >= 1 && gap <= 2) {
+          mood = "warning";
+          status = `あと${3 - count}回`;
+          title = "流れは切れてない。ここで次の1回。";
+          text = `今週は${count}回できています。短くてもいいので、今日は1種目だけ入れると週3が一気に近づきます。`;
+        } else if (gap >= 3) {
+          mood = "danger";
+          status = "再スタート";
+          title = "空いた日数は気にしない。今日で戻せる。";
+          text = "続いていない時ほど、完璧なメニューより再開の1セット。軽い重量でフォーム確認から入ろう。";
+        } else {
+          mood = "warning";
+          status = "未達";
+          title = "まだ週3に届く。焦らず1回ずつ。";
+          text = "今日の目的は追い込むことより、筋トレのスイッチを入れること。10分だけでも記録に残そう。";
+        }
+        banner.className = `trainer-banner ${mood}`.trim();
+        $("trainerKicker").textContent = "TRAINER MESSAGE";
+        $("trainerTitle").textContent = title;
+        $("trainerText").textContent = text;
+        $("trainerStatus").textContent = status;
+      }
+      function renderTabs() {
+        $("partTabs").innerHTML = parts.map(part => `<button type="button" class="${part === state.selectedPart ? "active" : ""}" data-part="${part}">${part}</button>`).join("");
+        document.querySelectorAll("[data-part]").forEach(btn => btn.addEventListener("click", () => {
+          state.selectedPart = btn.dataset.part;
+          render();
+        }));
+        $("growthPill").textContent = state.selectedPart;
+      }
+      function renderRecords() {
+        const logs = state.logs.map((log,index) => ({ ...log, index })).filter(log => log.part === state.selectedPart).reverse();
+        $("records").innerHTML = logs.length ? logs.map(log => {
+          const prev = previousFor(log, log.index);
+          const volume = tonnage(log);
+          const best = volume >= bestFor(log.exercise);
+          let gain = "初回記録";
+          let gainClass = "flat";
+          if (prev) {
+            const weightDiff = Number(log.weight) - Number(prev.weight);
+            const repsDiff = Number(log.reps) - Number(prev.reps);
+            gain = `${weightDiff >= 0 ? "+" : ""}${weightDiff}kg / ${repsDiff >= 0 ? "+" : ""}${repsDiff}回`;
+            gainClass = weightDiff > 0 || repsDiff > 0 ? "best" : "flat";
+          }
+          if (best && prev) gain = `BEST ${fmt(volume)}kg`;
+          return `<article class="record">
+            <div class="muscle-icon">${log.part.slice(0,1)}</div>
+            <div><strong>${log.exercise}</strong><small>${log.date}・${log.weight}kg × ${log.reps}回 × ${log.sets}セット・合計 ${fmt(volume)}kg</small></div>
+            <div class="gain ${gainClass}">${gain}</div>
+          </article>`;
+        }).join("") : `<article class="record"><div class="muscle-icon">${state.selectedPart.slice(0,1)}</div><div><strong>未記録</strong><small>この部位の記録はまだありません。</small></div><div class="gain flat">0</div></article>`;
+      }
+      function renderOptions() {
+        const exercises = [...new Set(state.logs.map(log => log.exercise))];
+        $("exerciseList").innerHTML = exercises.map(name => `<option value="${name}"></option>`).join("");
+      }
+      function renderBodyMap() {
+        const days = weekDates();
+        $("bodyMap").innerHTML = partStats({ start:days[0], end:days[days.length - 1] }).map(stat => {
+          return `<div class="body-part"><span>${stat.part}</span><strong>${stat.logs.length} 種目</strong><em>${fmt(stat.volume)}kg</em></div>`;
+        }).join("");
+      }
+      function renderChartMode() {
+        $("chartMode").querySelectorAll("[data-chart-mode]").forEach(btn => {
+          btn.classList.toggle("active", btn.dataset.chartMode === state.chartMode);
+        });
+      }
+      function renderPartChart() {
+        const range = rangeForChart();
+        const stats = partStats(range);
+        $("chartPill").textContent = `${range.label}・kg × 回数 × セット`;
+        $("chartCaption").textContent = range.caption;
+        const max = Math.max(...stats.map(stat => stat.volume), 1);
+        const chartWidth = 760;
+        const chartHeight = 300;
+        const left = 54;
+        const bottom = 246;
+        const barGap = 14;
+        const barWidth = (chartWidth - left - 32 - barGap * (stats.length - 1)) / stats.length;
+        let html = `<line x1="${left}" y1="28" x2="${left}" y2="${bottom}" stroke="#dfe3e6"/>
+          <line x1="${left}" y1="${bottom}" x2="730" y2="${bottom}" stroke="#dfe3e6"/>`;
+        for (let i = 0; i <= 4; i++) {
+          const y = bottom - i * 50;
+          const value = Math.round(max * i / 4);
+          html += `<line x1="${left}" y1="${y}" x2="730" y2="${y}" stroke="#eef0f2"/>
+            <text x="44" y="${y + 4}" text-anchor="end" fill="#6f757c" font-size="11">${fmt(value)}</text>`;
+        }
+        stats.forEach((stat,index) => {
+          const x = left + 12 + index * (barWidth + barGap);
+          const height = Math.max(4, stat.volume / max * 190);
+          const y = bottom - height;
+          const color = stat.improved ? "#d63838" : "#202428";
+          html += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${height.toFixed(1)}" rx="7" fill="${color}"/>
+            <text x="${(x + barWidth / 2).toFixed(1)}" y="${Math.max(22, y - 9).toFixed(1)}" text-anchor="middle" fill="${color}" font-size="12" font-weight="900">${fmt(stat.volume)}</text>
+            <text x="${(x + barWidth / 2).toFixed(1)}" y="270" text-anchor="middle" fill="#202428" font-size="12" font-weight="900">${stat.part}</text>
+            <text x="${(x + barWidth / 2).toFixed(1)}" y="288" text-anchor="middle" fill="#6f757c" font-size="10">${stat.improved ? `前回超え${stat.improved}` : `${stat.logs.length}種目`}</text>`;
+        });
+        $("partChart").innerHTML = html;
+        $("chartCards").innerHTML = stats
+          .filter(stat => stat.logs.length)
+          .sort((a,b) => b.volume - a.volume)
+          .slice(0,4)
+          .map(stat => `<div class="chart-card"><span>${stat.part}</span><strong>${fmt(stat.volume)}kg</strong><em>${stat.improved ? `前回超え ${stat.improved}件` : `最高 ${fmt(stat.best)}kg`}</em></div>`)
+          .join("") || `<div class="chart-card"><span>${range.label}</span><strong>記録なし</strong><em>筋トレを保存すると表示</em></div>`;
+      }
+      function renderLevel() {
+        const status = currentLevel();
+        const base = status.current.points;
+        const target = status.next ? status.next.points : status.current.points + 160;
+        const pct = Math.max(0, Math.min(100, (status.points - base) / (target - base) * 100));
+        $("heroPoints").textContent = `${status.points} pt`;
+        $("levelText").textContent = `Lv.${status.current.level}`;
+        $("levelName").textContent = status.current.name;
+        $("levelSub").textContent = status.next ? `${status.points - base} / ${target - base} pt` : `${status.points} pt`;
+        $("levelRing").style.background = `conic-gradient(var(--red) ${pct * 3.6}deg,#e6eaee 0)`;
+        $("levelMessage").textContent = status.next ? `次のレベルまであと ${status.next.points - status.points}pt。` : "最上位レベル。あとは記録を厚くするだけ。";
+        $("heroBest").textContent = [...new Set(state.logs.map(log => log.exercise))].length;
+      }
+      function renderReport() {
+        const count = workoutDays().length;
+        const top = [...state.logs].sort((a,b) => tonnage(b) - tonnage(a))[0];
+        const improved = state.logs.filter((log,index) => {
+          const prev = previousFor(log,index);
+          return prev && (Number(log.weight) > Number(prev.weight) || Number(log.reps) > Number(prev.reps));
+        }).length;
+        $("report").textContent = [
+          "【YUDAI Muscle Quest】",
+          `今週の筋トレ：${count}/3回`,
+          `ポイント：${points()}pt`,
+          `成長記録：前回超え ${improved}件`,
+          top ? `最大ボリューム：${top.exercise} ${fmt(tonnage(top))}kg` : "最大ボリューム：未記録",
+          count >= 3 ? "週3達成。次は重量か回数を1つ伸ばす。" : `あと${3 - count}回で週3達成。`
+        ].join("\n");
+      }
+      function renderPhotoSlider() {
+        const photo = musclePhotos[state.activePhoto];
+        $("photoMain").src = photo.img;
+        $("photoMain").alt = `${photo.title} - ${photo.author}`;
+        $("photoCount").textContent = `${state.activePhoto + 1} / ${musclePhotos.length}`;
+        $("photoTitle").textContent = photo.title;
+        $("photoNote").textContent = photo.note;
+        $("photoCredit").href = photo.source;
+        $("photoCredit").textContent = `Photo: ${photo.author} / Unsplash`;
+        $("photoThumbs").innerHTML = musclePhotos.map((item,index) => {
+          return `<button type="button" class="${index === state.activePhoto ? "active" : ""}" data-photo="${index}" aria-label="${index + 1}枚目の写真"><img src="${item.img}" alt=""></button>`;
+        }).join("");
+        document.querySelectorAll("[data-photo]").forEach(btn => btn.addEventListener("click", () => {
+          state.activePhoto = Number(btn.dataset.photo);
+          renderPhotoSlider();
+        }));
+      }
+      function render() {
+        renderWeek();
+        renderTrainerMessage();
+        renderTabs();
+        renderRecords();
+        renderOptions();
+        renderBodyMap();
+        renderChartMode();
+        renderPartChart();
+        renderLevel();
+        renderReport();
+        renderPhotoSlider();
+      }
+      $("logForm").addEventListener("submit", event => {
+        event.preventDefault();
+        const part = $("partInput").value;
+        const exercise = $("exerciseInput").value.trim();
+        const weight = Number($("weightInput").value);
+        const reps = Number($("repsInput").value);
+        if (!exercise || !Number.isFinite(weight) || !Number.isFinite(reps) || reps <= 0) {
+          toast("種目・重量・回数を確認してください");
+          return;
+        }
+        state.logs.push({ date:today, part, exercise, weight, reps, sets:3 });
+        state.selectedPart = part;
+        toast(`${exercise} を保存しました`);
+        render();
+      });
+      $("quickAddBtn").addEventListener("click", () => {
+        $("record").scrollIntoView({ behavior:"smooth", block:"start" });
+      });
+      $("resetBtn").addEventListener("click", () => {
+        state.logs = [...sampleLogs];
+        state.selectedPart = "胸";
+        state.activePhoto = 0;
+        state.chartMode = "week";
+        toast("サンプルに戻しました");
+        render();
+      });
+      $("chartMode").addEventListener("click", event => {
+        const btn = event.target.closest("[data-chart-mode]");
+        if (!btn) return;
+        state.chartMode = btn.dataset.chartMode;
+        render();
+      });
+      $("prevPhoto").addEventListener("click", () => {
+        state.activePhoto = (state.activePhoto - 1 + musclePhotos.length) % musclePhotos.length;
+        renderPhotoSlider();
+      });
+      $("nextPhoto").addEventListener("click", () => {
+        state.activePhoto = (state.activePhoto + 1) % musclePhotos.length;
+        renderPhotoSlider();
+      });
+      render();
+    })();
+  </script>
+</body>
+</html>

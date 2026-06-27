@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121416">
+  <title>筋肉写真記録 | YUDAI Muscle Quest</title>
+  <style>
+    :root {
+      color-scheme:light;
+      --ink:#151719;
+      --muted:#6f757c;
+      --paper:#f5f6f7;
+      --panel:#ffffff;
+      --line:#dfe3e6;
+      --coal:#202428;
+      --red:#d63838;
+      --red-soft:#ffe7e7;
+      --blue:#2278b8;
+      --green:#16885b;
+      --shadow:0 10px 24px rgba(21,23,25,.08);
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      color:var(--ink);
+      background:linear-gradient(180deg,#eceff1 0,#f7f7f5 320px,var(--paper) 100%);
+      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Segoe UI",sans-serif;
+      -webkit-tap-highlight-color:transparent;
+    }
+    button,input,textarea { font:inherit; }
+    button { cursor:pointer; }
+    a { color:inherit; }
+    .app { width:min(1080px,100%); margin:0 auto; padding:0 18px 80px; }
+    .topbar {
+      position:sticky;
+      z-index:20;
+      top:0;
+      margin:0 -18px;
+      padding:max(12px,env(safe-area-inset-top)) 18px 11px;
+      border-bottom:1px solid rgba(223,227,230,.86);
+      background:rgba(245,246,247,.92);
+      backdrop-filter:blur(18px);
+    }
+    .topbar-inner { max-width:1044px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .brand { min-width:0; display:flex; align-items:center; gap:10px; }
+    .brand-mark {
+      width:40px;
+      height:40px;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      border-radius:8px;
+      color:#fff;
+      background:linear-gradient(145deg,#111,#383d42);
+      font-weight:900;
+    }
+    .brand strong { display:block; font-size:15px; line-height:1.1; }
+    .brand span { display:block; margin-top:4px; color:var(--muted); font-size:10px; font-weight:800; }
+    .back-link {
+      min-height:40px;
+      padding:0 13px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      text-decoration:none;
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .trainer-banner {
+      margin-top:18px;
+      min-height:96px;
+      display:grid;
+      grid-template-columns:58px minmax(0,1fr) auto;
+      gap:13px;
+      align-items:center;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      box-shadow:var(--shadow);
+    }
+    .trainer-avatar {
+      width:58px;
+      height:58px;
+      display:grid;
+      place-items:center;
+      border-radius:8px;
+      color:#fff;
+      background:linear-gradient(145deg,#111,#3f464d);
+      font-size:22px;
+      font-weight:900;
+    }
+    .trainer-copy span { color:var(--red); font-size:10px; font-weight:900; }
+    .trainer-copy strong { display:block; margin-top:4px; color:var(--coal); font-size:17px; line-height:1.35; }
+    .trainer-copy p { margin:5px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
+    .trainer-status {
+      min-height:38px;
+      padding:0 12px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:999px;
+      color:#fff;
+      background:var(--green);
+      font-size:11px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .trainer-banner.warning .trainer-status { color:#111; background:#e0a51e; }
+    .trainer-banner.danger .trainer-status { background:var(--red); }
+    .hero {
+      margin-top:18px;
+      min-height:246px;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) 320px;
+      gap:18px;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#111;
+      box-shadow:var(--shadow);
+    }
+    .hero-copy { padding:24px; color:#fff; display:flex; flex-direction:column; justify-content:space-between; gap:18px; }
+    .kicker { color:#ffb3b3; font-size:11px; font-weight:900; }
+    h1 { margin:7px 0 0; max-width:560px; font-size:40px; line-height:1.08; letter-spacing:0; }
+    .hero-copy p { margin:10px 0 0; max-width:540px; color:#d5d8dc; font-size:13px; line-height:1.75; }
+    .hero-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+    .hero-stat { min-height:70px; padding:11px; border:1px solid rgba(255,255,255,.16); border-radius:8px; background:rgba(255,255,255,.07); }
+    .hero-stat span { display:block; color:#aeb5bc; font-size:10px; font-weight:800; }
+    .hero-stat strong { display:block; margin-top:6px; color:#fff; font-size:19px; }
+    .hero-photo {
+      min-height:246px;
+      background:
+        linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.64)),
+        url("https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=900&q=80") center / cover;
+    }
+    .grid { margin-top:16px; display:grid; grid-template-columns:360px minmax(0,1fr); gap:16px; align-items:start; }
+    .panel {
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:rgba(255,255,255,.96);
+      box-shadow:var(--shadow);
+    }
+    .panel-head {
+      min-height:58px;
+      padding:14px 16px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid var(--line);
+    }
+    .panel-head h2 { margin:0; color:var(--coal); font-size:17px; line-height:1.25; }
+    .panel-head p { margin:4px 0 0; color:var(--muted); font-size:10px; line-height:1.45; }
+    .pill { flex:0 0 auto; padding:6px 9px; border-radius:999px; color:var(--red); background:var(--red-soft); font-size:10px; font-weight:900; }
+    .panel-body { padding:16px; }
+    .upload-form { display:grid; gap:12px; }
+    .field { min-width:0; display:grid; gap:6px; }
+    .field label { color:var(--muted); font-size:10px; font-weight:900; }
+    .field input,.field textarea {
+      width:100%;
+      min-height:42px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:10px;
+      color:var(--coal);
+      background:#fff;
+      font-weight:800;
+    }
+    .field textarea { min-height:104px; resize:vertical; line-height:1.6; }
+    .file-picker {
+      min-height:156px;
+      display:grid;
+      gap:10px;
+      align-content:center;
+      padding:18px;
+      border:1px dashed #b7bec5;
+      border-radius:8px;
+      background:#fafafa;
+      text-align:center;
+    }
+    .file-picker input { width:100%; max-width:260px; }
+    .photo-source {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+    }
+    .source-btn {
+      min-height:44px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:8px;
+      color:#fff;
+      background:var(--coal);
+      font-size:12px;
+      font-weight:900;
+      text-align:center;
+    }
+    .source-btn.camera { background:var(--red); }
+    .hidden-input {
+      position:absolute;
+      width:1px;
+      height:1px;
+      overflow:hidden;
+      clip:rect(0 0 0 0);
+      clip-path:inset(50%);
+      white-space:nowrap;
+    }
+    .file-hint { color:var(--muted); font-size:10px; line-height:1.5; font-weight:800; }
+    .preview {
+      display:none;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#111;
+    }
+    .preview.show { display:block; }
+    .preview img { width:100%; max-height:320px; display:block; object-fit:cover; }
+    .save-btn {
+      min-height:44px;
+      border:0;
+      border-radius:8px;
+      color:#fff;
+      background:var(--red);
+      font-size:13px;
+      font-weight:900;
+    }
+    .sort-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+    .sort-row strong { color:var(--coal); font-size:13px; }
+    .segmented { display:flex; gap:5px; padding:4px; border-radius:8px; background:#edf0f2; }
+    .segmented button {
+      min-height:32px;
+      padding:0 11px;
+      border:0;
+      border-radius:6px;
+      color:var(--muted);
+      background:transparent;
+      font-size:11px;
+      font-weight:900;
+    }
+    .segmented button.active { color:#fff; background:var(--coal); }
+    .timeline { display:grid; gap:12px; }
+    .week-group {
+      display:grid;
+      gap:8px;
+      padding:12px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fafafa;
+    }
+    .week-title { display:flex; align-items:center; justify-content:space-between; gap:10px; color:var(--muted); font-size:11px; font-weight:900; }
+    .photo-card {
+      min-height:180px;
+      display:grid;
+      grid-template-columns:190px minmax(0,1fr);
+      gap:12px;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+    }
+    .photo-card img {
+      width:100%;
+      height:180px;
+      display:block;
+      object-fit:cover;
+      border-radius:6px;
+      background:#111;
+    }
+    .photo-card h3 { margin:0; color:var(--coal); font-size:17px; }
+    .photo-card p { margin:9px 0 0; color:var(--muted); font-size:12px; line-height:1.7; white-space:pre-wrap; }
+    .photo-card small { display:block; margin-top:10px; color:var(--blue); font-size:10px; font-weight:900; }
+    .delete-btn {
+      min-height:34px;
+      margin-top:14px;
+      padding:0 11px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      font-size:11px;
+      font-weight:900;
+    }
+    .empty {
+      min-height:220px;
+      display:grid;
+      place-items:center;
+      border:1px dashed #b7bec5;
+      border-radius:8px;
+      color:var(--muted);
+      background:#fafafa;
+      text-align:center;
+      font-size:13px;
+      font-weight:900;
+      line-height:1.7;
+    }
+    .toast {
+      position:fixed;
+      z-index:40;
+      right:18px;
+      bottom:24px;
+      left:18px;
+      max-width:420px;
+      margin:auto;
+      padding:12px 14px;
+      border-radius:8px;
+      color:#fff;
+      background:rgba(21,23,25,.94);
+      text-align:center;
+      font-size:12px;
+      font-weight:900;
+      opacity:0;
+      transform:translateY(10px);
+      pointer-events:none;
+      transition:.18s ease;
+    }
+    .toast.show { opacity:1; transform:none; }
+    @media (max-width:860px) {
+      .hero,.grid { grid-template-columns:1fr; }
+      .hero-photo { min-height:210px; }
+      .photo-card { grid-template-columns:150px minmax(0,1fr); }
+      .photo-card img { height:156px; }
+    }
+    @media (max-width:620px) {
+      .app { padding-inline:12px; }
+      .topbar { margin-inline:-12px; padding-inline:12px; }
+      .brand span { display:none; }
+      h1 { font-size:31px; }
+      .trainer-banner { grid-template-columns:48px minmax(0,1fr); }
+      .trainer-avatar { width:48px; height:48px; font-size:18px; }
+      .trainer-status { grid-column:1/-1; width:100%; }
+      .hero-copy { padding:18px; }
+      .hero-stats { grid-template-columns:1fr; }
+      .sort-row { align-items:flex-start; flex-direction:column; }
+      .segmented { width:100%; }
+      .segmented button { flex:1; }
+      .photo-source { grid-template-columns:1fr; }
+      .photo-card { grid-template-columns:1fr; }
+      .photo-card img { height:260px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-mark">YM</div>
+          <div>
+            <strong>YUDAI Muscle Quest</strong>
+            <span>週ごとの筋肉写真記録</span>
+          </div>
+        </div>
+        <a class="back-link" href="index.html">ホームへ</a>
+      </div>
+    </header>
+
+    <section class="trainer-banner" id="trainerBanner" aria-live="polite">
+      <div class="trainer-avatar">T</div>
+      <div class="trainer-copy">
+        <span>TRAINER MESSAGE</span>
+        <strong id="trainerTitle">写真記録の状態を確認中</strong>
+        <p id="trainerText">記録状況に合わせて、トレーナーから一言が入ります。</p>
+      </div>
+      <div class="trainer-status" id="trainerStatus">確認中</div>
+    </section>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <div>
+          <span class="kicker">BODY PHOTO LOG</span>
+          <h1>週ごとの変化を、写真で残す。</h1>
+          <p>体の変化はゆっくりだから、写真とメモで残して後から見返せるようにする。筋トレの数字と同じくらい、見た目の変化も成果にする。</p>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><span>記録枚数</span><strong id="totalCount">0</strong></div>
+          <div class="hero-stat"><span>記録週</span><strong id="weekCount">0</strong></div>
+          <div class="hero-stat"><span>最新</span><strong id="latestDate">未記録</strong></div>
+        </div>
+      </div>
+      <div class="hero-photo" aria-hidden="true"></div>
+    </section>
+
+    <div class="grid">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>写真を追加</h2>
+            <p>記録日とメモをセットで保存</p>
+          </div>
+          <span class="pill">週1チェック</span>
+        </div>
+        <div class="panel-body">
+          <form class="upload-form" id="photoForm">
+            <div class="field">
+              <label for="recordDate">記録日</label>
+              <input id="recordDate" type="date" required>
+            </div>
+            <div class="field">
+              <label for="photoInput">写真</label>
+              <div class="file-picker">
+                <div class="photo-source">
+                  <label class="source-btn" for="photoInput">写真を選ぶ</label>
+                  <label class="source-btn camera" for="cameraInput">カメラで撮る</label>
+                </div>
+                <input class="hidden-input" id="photoInput" type="file" accept="image/*">
+                <input class="hidden-input" id="cameraInput" type="file" accept="image/*" capture="environment">
+                <div class="file-hint">スマホでは「カメラで撮る」からその場で撮影できます。</div>
+              </div>
+            </div>
+            <div class="preview" id="previewBox">
+              <img id="previewImage" src="" alt="選択した写真">
+            </div>
+            <div class="field">
+              <label for="memoInput">メモ</label>
+              <textarea id="memoInput" maxlength="280" placeholder="胸の張り、肩のライン、体重、今日の感想など"></textarea>
+            </div>
+            <button class="save-btn" type="submit">写真記録を保存</button>
+          </form>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>写真タイムライン</h2>
+            <p>週ごとにまとめて時系列で表示</p>
+          </div>
+          <span class="pill" id="timelinePill">0週</span>
+        </div>
+        <div class="panel-body">
+          <div class="sort-row">
+            <strong id="timelineTitle">記録なし</strong>
+            <div class="segmented" aria-label="表示順">
+              <button type="button" class="active" data-order="desc">新しい順</button>
+              <button type="button" data-order="asc">古い順</button>
+            </div>
+          </div>
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (() => {
+      const storageKey = "yudai-muscle-photo-records-v1";
+      const state = { records:loadRecords(), order:"desc", pendingImage:null };
+      const $ = id => document.getElementById(id);
+
+      function todayISO() {
+        const date = new Date();
+        date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
+        return date.toISOString().slice(0,10);
+      }
+      function loadRecords() {
+        try {
+          return JSON.parse(localStorage.getItem(storageKey) || "[]");
+        } catch {
+          return [];
+        }
+      }
+      function saveRecords() {
+        localStorage.setItem(storageKey, JSON.stringify(state.records));
+      }
+      function toast(text) {
+        const el = $("toast");
+        el.textContent = text;
+        el.classList.add("show");
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => el.classList.remove("show"), 1800);
+      }
+      function formatDate(dateText) {
+        const date = new Date(`${dateText}T00:00:00`);
+        return date.toLocaleDateString("ja-JP", { month:"numeric", day:"numeric", weekday:"short" });
+      }
+      function dateDiffDays(later, earlier) {
+        const oneDay = 24 * 60 * 60 * 1000;
+        return Math.round((new Date(`${later}T00:00:00`) - new Date(`${earlier}T00:00:00`)) / oneDay);
+      }
+      function startOfWeek(dateText) {
+        const date = new Date(`${dateText}T00:00:00`);
+        const day = (date.getDay() + 6) % 7;
+        date.setDate(date.getDate() - day);
+        date.setHours(0,0,0,0);
+        return date;
+      }
+      function weekKey(dateText) {
+        const start = startOfWeek(dateText);
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        return `${start.toISOString().slice(0,10)}_${end.toISOString().slice(0,10)}`;
+      }
+      function weekLabel(key) {
+        const [start,end] = key.split("_");
+        return `${formatDate(start)} - ${formatDate(end)}`;
+      }
+      function escapeHtml(text) {
+        return String(text || "").replace(/[&<>"']/g, char => ({
+          "&":"&amp;",
+          "<":"&lt;",
+          ">":"&gt;",
+          "\"":"&quot;",
+          "'":"&#39;"
+        })[char]);
+      }
+      function resizeImage(file) {
+        return new Promise((resolve,reject) => {
+          const reader = new FileReader();
+          reader.onerror = () => reject(new Error("写真を読み込めませんでした"));
+          reader.onload = () => {
+            const img = new Image();
+            img.onerror = () => reject(new Error("写真を表示できませんでした"));
+            img.onload = () => {
+              const max = 1400;
+              const scale = Math.min(1, max / Math.max(img.width, img.height));
+              const canvas = document.createElement("canvas");
+              canvas.width = Math.round(img.width * scale);
+              canvas.height = Math.round(img.height * scale);
+              const ctx = canvas.getContext("2d");
+              ctx.drawImage(img,0,0,canvas.width,canvas.height);
+              resolve(canvas.toDataURL("image/jpeg", .82));
+            };
+            img.src = reader.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+      function groupedRecords() {
+        const sorted = [...state.records].sort((a,b) => {
+          const diff = a.date.localeCompare(b.date) || a.createdAt.localeCompare(b.createdAt);
+          return state.order === "desc" ? -diff : diff;
+        });
+        const groups = new Map();
+        sorted.forEach(record => {
+          const key = weekKey(record.date);
+          if (!groups.has(key)) groups.set(key, []);
+          groups.get(key).push(record);
+        });
+        const entries = [...groups.entries()];
+        return entries.sort((a,b) => state.order === "desc" ? b[0].localeCompare(a[0]) : a[0].localeCompare(b[0]));
+      }
+      function renderStats(groups) {
+        const latest = [...state.records].sort((a,b) => b.date.localeCompare(a.date))[0];
+        $("totalCount").textContent = state.records.length;
+        $("weekCount").textContent = groups.length;
+        $("latestDate").textContent = latest ? formatDate(latest.date) : "未記録";
+        $("timelinePill").textContent = `${groups.length}週`;
+        $("timelineTitle").textContent = state.records.length ? `${state.records.length}枚の記録` : "記録なし";
+      }
+      function renderTrainerMessage(groups) {
+        const latest = [...state.records].sort((a,b) => b.date.localeCompare(a.date))[0];
+        const banner = $("trainerBanner");
+        let mood = "";
+        let status = "順調";
+        let title = "写真記録も、体づくりのトレーニング。";
+        let text = "週1枚でも残しておくと、あとで変化に気づけます。数字で見えない成長もちゃんと拾っていこう。";
+        if (!latest) {
+          mood = "warning";
+          status = "初回待ち";
+          title = "最初の1枚を撮れば、変化のスタート地点ができる。";
+          text = "完璧なポーズじゃなくて大丈夫。正面・横・背中のどれか1枚だけでも、未来の比較材料になります。";
+        } else {
+          const gap = dateDiffDays(todayISO(), latest.date);
+          if (gap <= 7) {
+            mood = "";
+            status = "記録中";
+            title = "今週の写真、残せてる。いい管理です。";
+            text = `最新は${formatDate(latest.date)}。次回も同じ角度・同じ光で撮ると、変化がかなり見やすくなります。`;
+          } else if (gap <= 14) {
+            mood = "warning";
+            status = "そろそろ";
+            title = "次の写真を足すタイミング。";
+            text = "前回から少し空いています。筋トレ後でも朝でもいいので、今週の1枚を追加して流れを戻そう。";
+          } else {
+            mood = "danger";
+            status = "再開";
+            title = "写真記録は今日から再開でOK。";
+            text = "空いた期間は失敗ではなく、次に比べるための余白です。今日の体を1枚残して、また時系列をつなげよう。";
+          }
+        }
+        banner.className = `trainer-banner ${mood}`.trim();
+        $("trainerTitle").textContent = title;
+        $("trainerText").textContent = text;
+        $("trainerStatus").textContent = status;
+      }
+      function renderTimeline() {
+        const groups = groupedRecords();
+        renderStats(groups);
+        renderTrainerMessage(groups);
+        document.querySelectorAll("[data-order]").forEach(btn => {
+          btn.classList.toggle("active", btn.dataset.order === state.order);
+        });
+        $("timeline").innerHTML = groups.length ? groups.map(([key,items]) => {
+          const cards = items.map(record => `
+            <article class="photo-card">
+              <img src="${record.image}" alt="${escapeHtml(record.date)}の筋肉写真">
+              <div>
+                <h3>${formatDate(record.date)}</h3>
+                <p>${escapeHtml(record.memo || "メモなし")}</p>
+                <small>${escapeHtml(record.fileName || "photo")}</small>
+                <button class="delete-btn" type="button" data-delete="${record.id}">削除</button>
+              </div>
+            </article>
+          `).join("");
+          return `<section class="week-group"><div class="week-title"><span>${weekLabel(key)}</span><span>${items.length}枚</span></div>${cards}</section>`;
+        }).join("") : `<div class="empty">まだ写真記録がありません。<br>記録日と写真を追加すると、週ごとに並びます。</div>`;
+      }
+
+      $("recordDate").value = todayISO();
+      async function handlePhotoPick(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+          toast("画像ファイルを選んでください");
+          return;
+        }
+        try {
+          state.pendingImage = await resizeImage(file);
+          $("previewImage").src = state.pendingImage;
+          $("previewBox").classList.add("show");
+        } catch (error) {
+          toast(error.message);
+        }
+      }
+      $("photoInput").addEventListener("change", handlePhotoPick);
+      $("cameraInput").addEventListener("change", handlePhotoPick);
+      $("photoForm").addEventListener("submit", event => {
+        event.preventDefault();
+        const selectedFile = $("photoInput").files && $("photoInput").files[0];
+        const cameraFile = $("cameraInput").files && $("cameraInput").files[0];
+        const file = cameraFile || selectedFile;
+        const date = $("recordDate").value;
+        if (!date || !state.pendingImage) {
+          toast("記録日と写真を確認してください");
+          return;
+        }
+        state.records.push({
+          id:`photo-${Date.now()}`,
+          date,
+          memo:$("memoInput").value.trim(),
+          fileName:file ? file.name : "photo",
+          image:state.pendingImage,
+          createdAt:new Date().toISOString()
+        });
+        saveRecords();
+        $("photoForm").reset();
+        $("recordDate").value = todayISO();
+        state.pendingImage = null;
+        $("previewImage").src = "";
+        $("previewBox").classList.remove("show");
+        toast("写真記録を保存しました");
+        renderTimeline();
+      });
+      document.querySelector(".segmented").addEventListener("click", event => {
+        const btn = event.target.closest("[data-order]");
+        if (!btn) return;
+        state.order = btn.dataset.order;
+        renderTimeline();
+      });
+      $("timeline").addEventListener("click", event => {
+        const btn = event.target.closest("[data-delete]");
+        if (!btn) return;
+        state.records = state.records.filter(record => record.id !== btn.dataset.delete);
+        saveRecords();
+        toast("写真記録を削除しました");
+        renderTimeline();
+      });
+      renderTimeline();
+    })();
+  </script>
+</body>
+</html>
