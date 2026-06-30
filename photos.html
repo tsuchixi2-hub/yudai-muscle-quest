@@ -453,8 +453,7 @@
 
   <script>
     (() => {
-      const storageKey = "yudai-muscle-photo-records-v1";
-      const state = { records:loadRecords(), order:"desc", pendingImage:null };
+      const state = { records:[], order:"desc", pendingImage:null };
       const $ = id => document.getElementById(id);
 
       function todayISO() {
@@ -462,22 +461,37 @@
         date.setMinutes(date.getMinutes() - date.getTimezoneOffset());
         return date.toISOString().slice(0,10);
       }
-      function loadRecords() {
-        try {
-          return JSON.parse(localStorage.getItem(storageKey) || "[]");
-        } catch {
-          return [];
-        }
-      }
-      function saveRecords() {
-        localStorage.setItem(storageKey, JSON.stringify(state.records));
-      }
       function toast(text) {
         const el = $("toast");
         el.textContent = text;
         el.classList.add("show");
         clearTimeout(toast.timer);
         toast.timer = setTimeout(() => el.classList.remove("show"), 1800);
+      }
+      async function apiJson(path, options = {}) {
+        const response = await fetch(path, {
+          ...options,
+          headers:{
+            "content-type":"application/json",
+            ...(options.headers || {})
+          }
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || "api_error");
+        }
+        return data;
+      }
+      async function loadRecords() {
+        try {
+          const data = await apiJson("/api/photos");
+          state.records = Array.isArray(data.records) ? data.records : [];
+          renderTimeline();
+        } catch {
+          state.records = [];
+          renderTimeline();
+          toast("写真DBに接続できませんでした");
+        }
       }
       function formatDate(dateText) {
         const date = new Date(`${dateText}T00:00:00`);
@@ -634,7 +648,7 @@
       }
       $("photoInput").addEventListener("change", handlePhotoPick);
       $("cameraInput").addEventListener("change", handlePhotoPick);
-      $("photoForm").addEventListener("submit", event => {
+      $("photoForm").addEventListener("submit", async event => {
         event.preventDefault();
         const selectedFile = $("photoInput").files && $("photoInput").files[0];
         const cameraFile = $("cameraInput").files && $("cameraInput").files[0];
@@ -644,22 +658,31 @@
           toast("記録日と写真を確認してください");
           return;
         }
-        state.records.push({
-          id:`photo-${Date.now()}`,
-          date,
-          memo:$("memoInput").value.trim(),
-          fileName:file ? file.name : "photo",
-          image:state.pendingImage,
-          createdAt:new Date().toISOString()
-        });
-        saveRecords();
-        $("photoForm").reset();
-        $("recordDate").value = todayISO();
-        state.pendingImage = null;
-        $("previewImage").src = "";
-        $("previewBox").classList.remove("show");
-        toast("写真記録を保存しました");
-        renderTimeline();
+        const saveBtn = event.submitter || $("photoForm").querySelector(".save-btn");
+        saveBtn.disabled = true;
+        try {
+          const data = await apiJson("/api/photos", {
+            method:"POST",
+            body:JSON.stringify({
+              date,
+              memo:$("memoInput").value.trim(),
+              fileName:file ? file.name : "photo",
+              image:state.pendingImage
+            })
+          });
+          state.records.push(data.record);
+          $("photoForm").reset();
+          $("recordDate").value = todayISO();
+          state.pendingImage = null;
+          $("previewImage").src = "";
+          $("previewBox").classList.remove("show");
+          toast("写真記録をDBに保存しました");
+          renderTimeline();
+        } catch {
+          toast("写真を保存できませんでした。通信か画像サイズを確認してください");
+        } finally {
+          saveBtn.disabled = false;
+        }
       });
       document.querySelector(".segmented").addEventListener("click", event => {
         const btn = event.target.closest("[data-order]");
@@ -667,15 +690,20 @@
         state.order = btn.dataset.order;
         renderTimeline();
       });
-      $("timeline").addEventListener("click", event => {
+      $("timeline").addEventListener("click", async event => {
         const btn = event.target.closest("[data-delete]");
         if (!btn) return;
-        state.records = state.records.filter(record => record.id !== btn.dataset.delete);
-        saveRecords();
-        toast("写真記録を削除しました");
-        renderTimeline();
+        try {
+          await apiJson(`/api/photos?id=${encodeURIComponent(btn.dataset.delete)}`, { method:"DELETE" });
+          state.records = state.records.filter(record => record.id !== btn.dataset.delete);
+          toast("写真記録を削除しました");
+          renderTimeline();
+        } catch {
+          toast("削除できませんでした。通信を確認してください");
+        }
       });
       renderTimeline();
+      loadRecords();
     })();
   </script>
 </body>

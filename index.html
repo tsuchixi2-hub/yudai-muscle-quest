@@ -1261,6 +1261,31 @@
       const today = dateToISO(new Date());
       const $ = id => document.getElementById(id);
       const fmt = n => Number(n).toLocaleString("ja-JP");
+      async function apiJson(path, options = {}) {
+        const response = await fetch(path, {
+          ...options,
+          headers:{
+            "content-type":"application/json",
+            ...(options.headers || {})
+          }
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || "api_error");
+        }
+        return data;
+      }
+      async function loadLogs() {
+        try {
+          const data = await apiJson("/api/workouts");
+          state.logs = Array.isArray(data.logs) ? data.logs : [];
+          render();
+        } catch {
+          state.logs = [];
+          render();
+          toast("記録DBに接続できませんでした");
+        }
+      }
       function weekDates() {
         const base = new Date(`${today}T00:00:00`);
         const mondayOffset = (base.getDay() + 6) % 7;
@@ -1728,7 +1753,7 @@
         // renderVideoSlider();
         renderPhotoSlider();
       }
-      $("logForm").addEventListener("submit", event => {
+      $("logForm").addEventListener("submit", async event => {
         event.preventDefault();
         const part = $("partInput").value;
         const exercise = $("exerciseInput").value.trim();
@@ -1738,24 +1763,41 @@
           toast("種目・重量・回数を確認してください");
           return;
         }
-        state.logs.push({ date:today, part, exercise, weight, reps, sets:3 });
-        state.selectedPart = part;
-        toast(`${exercise} を保存しました`);
-        render();
+        const saveBtn = event.submitter || $("logForm").querySelector(".save-btn");
+        saveBtn.disabled = true;
+        try {
+          const data = await apiJson("/api/workouts", {
+            method:"POST",
+            body:JSON.stringify({ date:today, part, exercise, weight, reps, sets:3 })
+          });
+          state.logs.push(data.log);
+          state.selectedPart = part;
+          toast(`${exercise} をDBに保存しました`);
+          render();
+        } catch {
+          toast("保存できませんでした。通信を確認してください");
+        } finally {
+          saveBtn.disabled = false;
+        }
       });
       $("quickAddBtn").addEventListener("click", () => {
         $("record").scrollIntoView({ behavior:"smooth", block:"start" });
       });
-      $("resetBtn").addEventListener("click", () => {
-        state.logs = [];
-        state.selectedPart = "胸";
-        state.activePhoto = 0;
-        state.chartMode = "week";
-        // YouTube動画スライダー復活時に戻す
-        // state.videoPurpose = "すべて";
-        // state.videoPart = "すべて";
-        toast("入力データをクリアしました");
-        render();
+      $("resetBtn").addEventListener("click", async () => {
+        try {
+          await apiJson("/api/workouts?all=1", { method:"DELETE" });
+          state.logs = [];
+          state.selectedPart = "胸";
+          state.activePhoto = 0;
+          state.chartMode = "week";
+          // YouTube動画スライダー復活時に戻す
+          // state.videoPurpose = "すべて";
+          // state.videoPart = "すべて";
+          toast("DBの入力データをクリアしました");
+          render();
+        } catch {
+          toast("クリアできませんでした。通信を確認してください");
+        }
       });
       $("chartMode").addEventListener("click", event => {
         const btn = event.target.closest("[data-chart-mode]");
@@ -1787,6 +1829,7 @@
       //   $("videoTrack").scrollBy({ left:342, behavior:"smooth" });
       // });
       render();
+      loadLogs();
     })();
   </script>
 </body>

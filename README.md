@@ -12,8 +12,18 @@
 
 ## Cloudflare Pages
 
-Static HTML only.
+Static HTML + Pages Functions.
 
 - Build command: none
 - Build output directory: `/`
 - Production branch: `main`
+
+## Data storage
+
+- Workout logs: Cloudflare D1 (`workout_logs`)
+- Photo records: Cloudflare D1 (`photo_records`)
+- API routes:
+  - `/api/workouts`
+  - `/api/photos`
+
+R2 is not enabled on the Cloudflare account yet, so compressed photo data is currently stored in D1 as a data URL. When R2 is enabled, move photo binaries to R2 and keep only metadata and object keys in D1.
