@@ -33,6 +33,7 @@
     .kicker { color:var(--red); font-size:11px; font-weight:900; letter-spacing:.12em; }
     h1 { margin:7px 0 0; color:var(--coal); font-size:42px; line-height:1.05; letter-spacing:0; }
     .lead { margin:10px 0 0; max-width:660px; color:var(--muted); font-size:13px; line-height:1.75; }
+    .top-links { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
     .back {
       min-height:42px;
       padding:0 14px;
@@ -47,6 +48,7 @@
       font-size:12px;
       font-weight:900;
     }
+    .back.primary { border-color:#f0b1b1; color:#9c1f1f; background:#fff5f5; }
     .summary {
       margin-top:20px;
       display:grid;
@@ -107,7 +109,8 @@
     }
     @media (max-width:820px) {
       .top { flex-direction:column; }
-      .back { width:100%; }
+      .top-links { width:100%; }
+      .back { flex:1 1 auto; }
       .summary,.grid,.levels { grid-template-columns:1fr; }
       h1 { font-size:32px; }
     }
@@ -119,31 +122,39 @@
       <div>
         <div class="kicker">POINT & LEVEL GUIDE</div>
         <h1>どうすればレベルが上がるか</h1>
-        <p class="lead">優大さん版は「週3回の実行」と「前回の自分を少し超えること」を中心にポイント化します。筋トレは休む日も大事なので、毎日強制ではなく週単位で育てます。</p>
+        <p class="lead">優大さん版は「重さや回数を伸ばすこと」よりも、部位ごとに休息を入れながら続けることを中心にポイント化します。同じ部位は1日休んで2日目に戻るのをベスト、2日休んで3日目までは許容として見ます。</p>
       </div>
-      <a class="back" href="index.html">アプリに戻る</a>
+      <div class="top-links">
+        <a class="back primary" href="theory.html">超回復の理論を見る</a>
+        <a class="back" href="index.html">アプリに戻る</a>
+      </div>
     </div>
 
     <section class="summary">
-      <div><span>基本方針</span><strong>週3回</strong></div>
-      <div><span>実行ポイント</span><strong>+10pt</strong></div>
-      <div><span>週3ボーナス</span><strong>+30pt</strong></div>
-      <div><span>成長ボーナス</span><strong>+5〜8pt</strong></div>
+      <div><span>基本方針</span><strong>休息リズム</strong></div>
+      <div><span>実行日</span><strong>+8pt</strong></div>
+      <div><span>ベスト間隔</span><strong>+18pt</strong></div>
+      <div><span>7日特別</span><strong>+120pt</strong></div>
     </section>
 
     <div class="grid">
       <section class="panel">
         <div class="panel-head">
           <h2>レベル一覧</h2>
-          <p>ポイントが増えると称号が変わります。正式版ではここにバッジ画像も追加できます。</p>
+          <p>ポイントが増えると称号が変わります。重量よりも、部位ごとの休息管理と継続リズムを評価します。</p>
         </div>
         <div class="panel-body">
           <div class="levels">
-            <article class="level current"><small>Lv.1 / 0pt</small><strong>フォーム見習い</strong><em>まずは記録を始める</em><span>種目名・重量・回数を残す段階。</span></article>
-            <article class="level"><small>Lv.2 / 120pt</small><strong>週3チャレンジャー</strong><em>週3ペースが見えてきた</em><span>実行日を増やすことが最優先。</span></article>
-            <article class="level"><small>Lv.3 / 260pt</small><strong>継続ビルダー</strong><em>前回比を追える</em><span>重量か回数の小さな更新を狙う。</span></article>
-            <article class="level"><small>Lv.4 / 420pt</small><strong>重量ハンター</strong><em>自己ベスト更新を楽しむ</em><span>部位ごとの強みが見えてくる。</span></article>
-            <article class="level"><small>Lv.5 / 620pt</small><strong>筋肉クエスト王</strong><em>習慣が体に残る</em><span>継続・成長・バランスの完成形。</span></article>
+            <article class="level current"><small>Lv.1 / 0pt</small><strong>リズム開始</strong><em>まずは記録を始める</em><span>重量よりも、どの部位をいつやったかを残す段階。</span></article>
+            <article class="level"><small>Lv.2 / 80pt</small><strong>休息メモ係</strong><em>休ませる意識が出てきた</em><span>同じ部位を連日やりすぎない流れを作る。</span></article>
+            <article class="level"><small>Lv.3 / 180pt</small><strong>週リズム見習い</strong><em>週の中で戻ってこられる</em><span>空きすぎた部位を見つけて戻す。</span></article>
+            <article class="level"><small>Lv.4 / 320pt</small><strong>部位ローテーター</strong><em>上半身と下半身を回せる</em><span>胸・背中・脚・腹などを偏らせず回す。</span></article>
+            <article class="level"><small>Lv.5 / 500pt</small><strong>継続ビルダー</strong><em>1日休息の型が見えてきた</em><span>同じ部位へベストタイミングで戻れる。</span></article>
+            <article class="level"><small>Lv.6 / 720pt</small><strong>休息マスター</strong><em>休む日も計画の一部</em><span>やりすぎと空きすぎの両方を避ける。</span></article>
+            <article class="level"><small>Lv.7 / 980pt</small><strong>7日リズム職人</strong><em>毎日どこかを動かせる</em><span>部位を変えながら1週間の流れを作る。</span></article>
+            <article class="level"><small>Lv.8 / 1280pt</small><strong>習慣アスリート</strong><em>継続が自然になってきた</em><span>短い日でも記録に戻ってこられる。</span></article>
+            <article class="level"><small>Lv.9 / 1620pt</small><strong>部位管理プロ</strong><em>空きすぎを自分で直せる</em><span>丸3日以上休みっぱなしの部位をすぐ回収できる。</span></article>
+            <article class="level"><small>Lv.10 / 2000pt</small><strong>筋肉クエスト王</strong><em>休息と継続の完成形</em><span>重さよりも、続ける仕組みが体に残る。</span></article>
           </div>
         </div>
       </section>
@@ -155,10 +166,10 @@
         </div>
         <div class="panel-body">
           <div class="rule-list">
-            <div class="rule"><strong>1. 週3回を先に守る</strong><span>重量アップより先に、月・水・金など実行リズムを作る。</span></div>
-            <div class="rule"><strong>2. 同じ種目を続ける</strong><span>前回比が見えるので、成長ポイントが取りやすい。</span></div>
-            <div class="rule"><strong>3. 1つだけ前回超え</strong><span>重量+2.5kg、または回数+1回で十分。</span></div>
-            <div class="rule"><strong>4. 部位の偏りを直す</strong><span>胸だけでなく背中・脚も入れると見た目が整う。</span></div>
+            <div class="rule"><strong>1. 毎日どこかの部位を記録する</strong><span>追い込まなくてもOK。短い1種目でも、継続の土台として加点。</span></div>
+            <div class="rule"><strong>2. 同じ部位は連続させすぎない</strong><span>胸の翌日は脚や背中など、部位を変えて休息を作る。</span></div>
+            <div class="rule"><strong>3. 1日休んで2日目に同じ部位へ戻る</strong><span>このモックでは、前回から1日休息を入れて2日目に戻るとベスト加点。</span></div>
+            <div class="rule"><strong>4. 2日休息までは許容、丸3日休みっぱなしは避ける</strong><span>2日休んで3日目に戻るのは許容。丸3日以上同じ部位が空いたら減点。</span></div>
           </div>
         </div>
       </section>
@@ -174,16 +185,19 @@
           <table>
             <thead><tr><th>行動</th><th>ポイント</th><th>条件</th></tr></thead>
             <tbody>
-              <tr><td>筋トレ記録を1件保存</td><td>+10pt</td><td>部位・種目・重量・回数を入力</td></tr>
-              <tr><td>週3回の筋トレを達成</td><td>+30pt</td><td>週内に3日以上、何か記録する</td></tr>
-              <tr><td>前回より重量アップ</td><td>+8pt</td><td>同じ種目で前回より重量が増えた</td></tr>
-              <tr><td>前回より回数アップ</td><td>+5pt</td><td>同じ種目で前回より回数が増えた</td></tr>
-              <tr><td>新しい種目を登録</td><td>+3pt</td><td>種目バリエーションを増やす</td></tr>
-              <tr><td>自己ベスト更新</td><td>表示強調</td><td>合計ボリュームが過去最高になった</td></tr>
+              <tr><td>筋トレ記録を1件保存</td><td>+6pt</td><td>部位・種目・重量・回数を入力。記録は小さく加点。</td></tr>
+              <tr><td>今週の実行日</td><td>+8pt / 日</td><td>同じ日に複数種目をやっても、継続日としては1日分。</td></tr>
+              <tr><td>ベスト部位間隔</td><td>+18pt</td><td>同じ部位を1日休ませ、2日目に実行できたとき。</td></tr>
+              <tr><td>許容部位間隔</td><td>+10pt</td><td>疲労が強く、2日休ませて3日目に戻ったとき。</td></tr>
+              <tr><td>部位バリエーション</td><td>+10pt / 部位</td><td>胸だけ、脚だけに偏らず複数部位を回す。</td></tr>
+              <tr><td>7日リズム特別ボーナス</td><td>+120pt</td><td>1週間毎日実行し、前日と同じ部位を連続させない。</td></tr>
+              <tr><td>同じ部位を連日</td><td>-8pt</td><td>休息が短すぎる扱い。やりすぎ防止。</td></tr>
+              <tr><td>部位が丸3日以上空く</td><td>-15pt / 部位</td><td>最後の実行後、3日連続で同じ部位が未実行のとき。</td></tr>
+              <tr><td>重量・回数アップ</td><td>加点なし</td><td>成長記録として表示は残すが、レベル上げでは優先しない。</td></tr>
             </tbody>
           </table>
         </div>
-        <div class="tip">一番大事なのは、完璧なメニューより「週3回戻ってくること」。筋トレは続けた人がいちばん強いです。</div>
+        <div class="tip">このモックのルールは医学的な断定ではなく、習慣化しやすくするための仮設です。背景にある考え方は <a href="theory.html">超回復と筋肥大理論</a> にまとめています。</div>
       </div>
     </section>
   </main>

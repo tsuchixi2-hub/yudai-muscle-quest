@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121416">
+  <title>超回復と筋肥大理論 | YUDAI Muscle Quest</title>
+  <style>
+    :root {
+      color-scheme:light;
+      --ink:#151719;
+      --muted:#6f757c;
+      --paper:#f5f6f7;
+      --panel:#fff;
+      --line:#dfe3e6;
+      --coal:#202428;
+      --red:#d63838;
+      --red-soft:#ffe7e7;
+      --green:#16885b;
+      --yellow:#e0a51e;
+      --shadow:0 10px 24px rgba(21,23,25,.08);
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      color:var(--ink);
+      background:linear-gradient(180deg,#eceff1 0,#f7f7f5 360px,var(--paper) 100%);
+      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Segoe UI",sans-serif;
+    }
+    a { color:inherit; }
+    .app { width:min(1120px,100%); margin:0 auto; padding:24px 18px 70px; }
+    .top { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; }
+    .kicker { color:var(--red); font-size:11px; font-weight:900; letter-spacing:.12em; }
+    h1 { margin:7px 0 0; color:var(--coal); font-size:42px; line-height:1.06; letter-spacing:0; }
+    .lead { margin:10px 0 0; max-width:720px; color:var(--muted); font-size:13px; line-height:1.75; }
+    .top-links { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
+    .back {
+      min-height:42px;
+      padding:0 14px;
+      display:grid;
+      place-items:center;
+      flex:0 0 auto;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      text-decoration:none;
+      font-size:12px;
+      font-weight:900;
+    }
+    .back.primary { border-color:#f0b1b1; color:#9c1f1f; background:#fff5f5; }
+    .summary {
+      margin-top:20px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+    .summary div,.panel,.source-card {
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:rgba(255,255,255,.96);
+      box-shadow:var(--shadow);
+    }
+    .summary div { min-height:94px; padding:14px; }
+    .summary span { display:block; color:var(--muted); font-size:10px; font-weight:900; }
+    .summary strong { display:block; margin-top:7px; color:var(--coal); font-size:20px; line-height:1.25; }
+    .grid { display:grid; grid-template-columns:minmax(0,1.1fr) minmax(300px,.62fr); gap:16px; align-items:start; margin-top:16px; }
+    .stack { display:grid; gap:16px; }
+    .panel-head { padding:15px 16px; border-bottom:1px solid var(--line); }
+    .panel-head h2 { margin:0; color:var(--coal); font-size:18px; }
+    .panel-head p { margin:4px 0 0; color:var(--muted); font-size:10px; line-height:1.55; }
+    .panel-body { padding:16px; }
+    .principle-list,.rule-list,.source-list { display:grid; gap:10px; }
+    .principle,.rule {
+      padding:13px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fafafa;
+    }
+    .principle strong,.rule strong { display:block; color:var(--coal); font-size:14px; line-height:1.45; }
+    .principle span,.rule span { display:block; margin-top:5px; color:var(--muted); font-size:11px; line-height:1.7; }
+    .timeline {
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:8px;
+    }
+    .phase {
+      min-height:132px;
+      padding:13px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fafafa;
+    }
+    .phase b { color:var(--red); font-size:11px; }
+    .phase strong { display:block; margin-top:6px; color:var(--coal); font-size:14px; line-height:1.35; }
+    .phase p { margin:7px 0 0; color:var(--muted); font-size:10px; line-height:1.6; }
+    .formula {
+      padding:15px;
+      border-radius:8px;
+      color:#fff;
+      background:linear-gradient(145deg,#151719,#343b42);
+    }
+    .formula span { color:#cfd5da; font-size:10px; font-weight:900; }
+    .formula strong { display:block; margin-top:6px; font-size:22px; line-height:1.25; }
+    .formula p { margin:8px 0 0; color:#dfe3e6; font-size:11px; line-height:1.7; }
+    .week-model {
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:7px;
+    }
+    .day {
+      min-height:88px;
+      padding:10px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      text-align:center;
+    }
+    .day span { display:block; color:var(--muted); font-size:9px; font-weight:900; }
+    .day strong { display:block; margin-top:7px; color:var(--coal); font-size:13px; line-height:1.35; }
+    .day em { display:block; margin-top:5px; color:var(--red); font-size:9px; font-style:normal; font-weight:900; }
+    .note {
+      margin-top:12px;
+      padding:13px;
+      border-radius:8px;
+      color:#7a4800;
+      background:#fff3d7;
+      font-size:12px;
+      font-weight:800;
+      line-height:1.7;
+    }
+    .source-card { padding:13px; }
+    .source-card a { color:var(--coal); font-size:12px; font-weight:900; line-height:1.45; text-decoration:none; }
+    .source-card span { display:block; margin-top:5px; color:var(--muted); font-size:10px; line-height:1.5; }
+    @media (max-width:900px) {
+      .top { flex-direction:column; }
+      .top-links { width:100%; justify-content:stretch; }
+      .back { flex:1 1 auto; }
+      .summary,.grid,.timeline,.week-model { grid-template-columns:1fr; }
+      h1 { font-size:32px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="top">
+      <div>
+        <div class="kicker">RECOVERY & HYPERTROPHY THEORY</div>
+        <h1>超回復と、効率よく鍛える理論</h1>
+        <p class="lead">このページは、優大さんのポイント設計の根拠です。結論は「同じ部位を毎日つぶす」よりも、「十分な刺激を入れ、1日休ませ、2日目に戻る」こと。疲労が強いときは2日休ませて3日目に戻るのも許容します。</p>
+      </div>
+      <div class="top-links">
+        <a class="back primary" href="levels.html">ポイント表へ</a>
+        <a class="back" href="index.html">アプリに戻る</a>
+      </div>
+    </div>
+
+    <section class="summary">
+      <div><span>基本モデル</span><strong>刺激 → 疲労 → 回復 → 適応</strong></div>
+      <div><span>優先する刺激</span><strong>機械的張力</strong></div>
+      <div><span>部位間隔</span><strong>1日休息→2日目</strong></div>
+      <div><span>土台</span><strong>睡眠・食事・継続</strong></div>
+    </section>
+
+    <div class="grid">
+      <div class="stack">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>超回復をどう考えるか</h2>
+            <p>固定の48時間ルールではなく、疲労と適応の波として扱います。</p>
+          </div>
+          <div class="panel-body">
+            <div class="timeline">
+              <div class="phase"><b>1</b><strong>刺激</strong><p>筋トレで筋肉と神経に負荷をかける。筋肥大では、筋肉に張力をかけることが中心。</p></div>
+              <div class="phase"><b>2</b><strong>疲労</strong><p>直後は一時的にパフォーマンスが落ちる。筋肉痛、フォーム低下、集中力低下もサイン。</p></div>
+              <div class="phase"><b>3</b><strong>回復</strong><p>栄養と睡眠で筋タンパク質合成が進む。刺激が強いほど回復にも時間が必要。</p></div>
+              <div class="phase"><b>4</b><strong>適応</strong><p>回復後に少し強くなる。ここで次の刺激を入れると、長期的に積み上がりやすい。</p></div>
+            </div>
+            <div class="note">「超回復」は便利な説明モデルですが、全員が同じ時間で回復するわけではありません。部位、種目、強度、睡眠、食事、筋トレ歴で変わります。このアプリでは、実用ルールとして「1日休息して2日目がベスト、2日休息して3日目までは許容、丸3日休みっぱなしは空きすぎ」を採用します。</div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>効率よく筋肉を鍛える原則</h2>
+            <p>筋肥大を狙うときに優先度が高いもの。</p>
+          </div>
+          <div class="panel-body">
+            <div class="principle-list">
+              <div class="principle"><strong>1. 機械的張力を作る</strong><span>筋肉を伸ばし縮めながら、十分に重い負荷や高い努力度をかける。軽い重量でも限界に近ければ刺激になりますが、フォームが崩れるほど追い込む必要はありません。</span></div>
+              <div class="principle"><strong>2. 週あたりの十分な量を確保する</strong><span>1回で全部やるより、部位ごとに週の中へ分散した方が続きやすいです。アプリでは実行日と部位ローテーションを重視します。</span></div>
+              <div class="principle"><strong>3. 少しずつ進歩させる</strong><span>重量・回数・セット数・フォームの安定・可動域のどれかを少しずつ良くする。ただし、ポイントは成長競争ではなく継続リズムに置きます。</span></div>
+              <div class="principle"><strong>4. 回復できる範囲に収める</strong><span>同じ部位の連日高負荷は回復不足になりやすい一方、空きすぎると刺激の頻度が落ちます。まずは1日休ませて2日目に戻る流れを基準にします。</span></div>
+              <div class="principle"><strong>5. タンパク質と睡眠を外さない</strong><span>筋トレは刺激、食事と睡眠は材料と修復時間。正式版では、将来的に睡眠・食事メモもポイント補助に入れられます。</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>アプリのポイント設計に落とす</h2>
+            <p>理論を、そのまま優大さん版の習慣ルールに変換します。</p>
+          </div>
+          <div class="panel-body">
+            <div class="rule-list">
+              <div class="rule"><strong>1日休息して2日目ならベスト加点</strong><span>前回の翌日は休ませ、次の日に戻る流れ。胸、背中、脚などを交互に回すと取りやすい。</span></div>
+              <div class="rule"><strong>2日休息して3日目なら許容加点</strong><span>疲労や筋肉痛が強いときの余白。ベストではないが、空きすぎ扱いにはしません。</span></div>
+              <div class="rule"><strong>同じ部位を連日やりすぎたら減点</strong><span>休息が短すぎるサイン。軽いフォーム練習なら別ですが、習慣アプリではやりすぎ防止を優先。</span></div>
+              <div class="rule"><strong>丸3日以上空いた部位は減点</strong><span>3日連続で同じ部位が未実行なら空きすぎ。軽い1種目でも、戻ってくることを評価します。</span></div>
+              <div class="rule"><strong>毎日どこかの部位を実行できたら特別加点</strong><span>同じ部位を潰すのではなく、上半身・下半身・体幹を回して1週間続けることを評価します。</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>1週間の考え方</h2>
+            <p>「毎日やる」と「同じ部位を休ませる」を両立する例。</p>
+          </div>
+          <div class="panel-body">
+            <div class="week-model">
+              <div class="day"><span>月</span><strong>上半身A</strong><em>胸・肩</em></div>
+              <div class="day"><span>火</span><strong>下半身A</strong><em>脚</em></div>
+              <div class="day"><span>水</span><strong>上半身B</strong><em>背中・腕</em></div>
+              <div class="day"><span>木</span><strong>体幹</strong><em>腹・軽め</em></div>
+              <div class="day"><span>金</span><strong>上半身A</strong><em>胸・肩</em></div>
+              <div class="day"><span>土</span><strong>下半身B</strong><em>脚・臀部</em></div>
+              <div class="day"><span>日</span><strong>上半身B</strong><em>背中・腕</em></div>
+            </div>
+            <div class="note">疲労が強い日は、重量を落としてフォーム確認・可動域・ストレッチ寄りにしてもOK。痛みがある場合は無理をしない前提です。</div>
+          </div>
+        </section>
+      </div>
+
+      <aside class="stack">
+        <section class="panel">
+          <div class="panel-head">
+            <h2>最短ルール</h2>
+            <p>迷ったときの判断基準。</p>
+          </div>
+          <div class="panel-body">
+            <div class="formula">
+              <span>YUDAI MUSCLE QUEST FORMULA</span>
+              <strong>よい刺激 × よい休息 × また戻る</strong>
+              <p>筋トレの効率は、1回の根性だけで決まりません。刺激を入れた部位を休ませ、回復後にまた戻ることを、アプリのレベルアップ条件にします。</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>誤解しやすい点</h2>
+            <p>このページでの扱い。</p>
+          </div>
+          <div class="panel-body">
+            <div class="rule-list">
+              <div class="rule"><strong>48時間は絶対ルールではない</strong><span>目安として便利ですが、脚の高負荷トレーニングと腹筋の軽いメニューでは回復時間が違います。</span></div>
+              <div class="rule"><strong>筋肉痛がない=効いていない、ではない</strong><span>筋肉痛は刺激の一部を示しますが、筋肥大の絶対条件ではありません。</span></div>
+              <div class="rule"><strong>重ければ重いほど良い、でもない</strong><span>狙った筋肉に張力が入り、フォームが保てる範囲が大切です。</span></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>参考文献</h2>
+            <p>アプリ内のルール設計で参照した研究・レビュー。</p>
+          </div>
+          <div class="panel-body">
+            <div class="source-list">
+              <div class="source-card"><a href="https://doi.org/10.1249/MSS.0b013e3181915670" target="_blank" rel="noreferrer">ACSM Position Stand: Progression Models in Resistance Training for Healthy Adults</a><span>負荷、回数、セット、頻度などの進め方に関する基本資料。</span></div>
+              <div class="source-card"><a href="https://doi.org/10.1519/JSC.0b013e3181e840f3" target="_blank" rel="noreferrer">Schoenfeld: The mechanisms of muscle hypertrophy and their application to resistance training</a><span>筋肥大の主要メカニズムを整理したレビュー。</span></div>
+              <div class="source-card"><a href="https://doi.org/10.1007/s40279-016-0543-8" target="_blank" rel="noreferrer">Schoenfeld et al.: Resistance training frequency and hypertrophy meta-analysis</a><span>頻度は週あたりボリュームを分散する考え方として扱う。</span></div>
+              <div class="source-card"><a href="https://doi.org/10.1080/02640414.2016.1210197" target="_blank" rel="noreferrer">Schoenfeld et al.: Weekly resistance training volume and muscle mass</a><span>筋肥大と週あたりトレーニング量の関係を扱うメタ分析。</span></div>
+              <div class="source-card"><a href="https://bjsm.bmj.com/content/52/6/376" target="_blank" rel="noreferrer">Morton et al.: Protein supplementation and resistance training meta-analysis</a><span>筋力トレーニング時のタンパク質摂取と除脂肪量・筋力の関係。</span></div>
+              <div class="source-card"><a href="https://doi.org/10.1007/s40279-015-0320-0" target="_blank" rel="noreferrer">Damas et al.: Muscle protein synthesis and hypertrophy review</a><span>筋タンパク質合成と筋肥大の関係を整理したレビュー。</span></div>
+            </div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+</body>
+</html>

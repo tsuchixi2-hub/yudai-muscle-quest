@@ -113,20 +113,25 @@
     .trainer-copy strong { display:block; margin-top:4px; color:var(--coal); font-size:17px; line-height:1.35; }
     .trainer-copy p { margin:5px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
     .trainer-status {
-      min-height:38px;
-      padding:0 12px;
+      min-width:86px;
+      min-height:46px;
+      padding:0 18px;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      border-radius:999px;
-      color:#fff;
-      background:var(--green);
-      font-size:11px;
+      border-radius:8px;
+      border:2px solid #128156;
+      color:#075c3b;
+      background:#e9f8f1;
+      font-size:15px;
       font-weight:900;
+      line-height:1;
+      text-align:center;
       white-space:nowrap;
+      box-shadow:none;
     }
-    .trainer-banner.warning .trainer-status { background:var(--yellow); color:#111; }
-    .trainer-banner.danger .trainer-status { background:var(--red); }
+    .trainer-banner.warning .trainer-status { border-color:#b97a00; background:#fff3cc; color:#5f3e00; }
+    .trainer-banner.danger .trainer-status { border-color:#d63838; background:#fff0f0; color:#9c1f1f; }
     .shell { display:grid; grid-template-columns:minmax(0,1fr) 338px; gap:18px; align-items:start; padding-top:18px; }
     .main { display:grid; gap:16px; min-width:0; }
     .side { display:grid; gap:16px; min-width:0; }
@@ -347,14 +352,81 @@
     .chart-mode button.active { color:#fff; background:var(--red); }
     .chart-frame {
       min-height:306px;
-      padding:10px 4px 2px;
-      overflow:hidden;
+      padding:10px;
+      overflow:auto;
       border:1px solid var(--line);
       border-radius:8px;
       background:#fafafa;
     }
-    .chart-frame svg { display:block; width:100%; height:auto; min-height:280px; }
-    .chart-cards { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .recovery-chart { min-width:760px; display:grid; gap:8px; }
+    .recovery-row {
+      display:grid;
+      gap:6px;
+      align-items:stretch;
+    }
+    .recovery-row.head {
+      position:sticky;
+      top:0;
+      z-index:1;
+      padding-bottom:2px;
+      background:#fafafa;
+    }
+    .recovery-label,
+    .recovery-date,
+    .recovery-state {
+      min-height:44px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      border-radius:8px;
+      font-size:10px;
+      font-weight:900;
+    }
+    .recovery-label {
+      padding:8px;
+      color:#fff;
+      background:var(--coal);
+    }
+    .recovery-label span { margin-top:3px; color:#cfd5da; font-size:9px; }
+    .recovery-date {
+      align-items:center;
+      color:var(--muted);
+      background:#edf0f2;
+      text-align:center;
+    }
+    .recovery-date strong { color:var(--coal); font-size:13px; }
+    .recovery-cell {
+      min-height:72px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      gap:3px;
+      padding:8px 6px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:#a0a6ad;
+      background:#fff;
+      text-align:center;
+      font-size:9px;
+      font-weight:900;
+    }
+    .recovery-cell.done { border-color:#f0b1b1; color:var(--coal); background:#fff5f5; }
+    .recovery-cell.done strong { color:var(--red); font-size:13px; }
+    .recovery-cell.done span { color:var(--coal); font-size:10px; }
+    .recovery-cell.done em { color:var(--muted); font-size:9px; font-style:normal; line-height:1.25; }
+    .recovery-state {
+      padding:8px;
+      border:1px solid var(--line);
+      background:#fff;
+      line-height:1.35;
+    }
+    .recovery-state.good { border-color:#bde7d3; color:var(--green); background:#f1fbf6; }
+    .recovery-state.short { border-color:#ffe0a3; color:#8a5d00; background:#fff8e8; }
+    .recovery-state.long { border-color:#f3b5b5; color:var(--red); background:#fff0f0; }
+    .recovery-state.empty { color:var(--muted); }
+    .recovery-state strong { font-size:12px; }
+    .recovery-state span { margin-top:3px; color:var(--muted); font-size:9px; }
+    .chart-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:8px; }
     .chart-card {
       min-height:72px;
       padding:10px;
@@ -366,6 +438,153 @@
     .chart-card strong { display:block; margin-top:5px; color:var(--coal); font-size:15px; }
     .chart-card em { display:block; margin-top:5px; color:var(--red); font-size:10px; font-style:normal; font-weight:900; }
     .report { white-space:pre-wrap; color:var(--coal); font-size:12px; line-height:1.75; }
+    .video-section {
+      margin-top:18px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .video-head {
+      min-height:74px;
+      padding:16px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      border-bottom:1px solid var(--line);
+      background:#fafafa;
+    }
+    .video-head h2 { margin:0; color:var(--coal); font-size:18px; }
+    .video-head p { margin:4px 0 0; color:var(--muted); font-size:10px; line-height:1.55; }
+    .video-filters {
+      padding:12px 16px;
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,220px)) minmax(120px,1fr);
+      gap:10px;
+      align-items:end;
+      border-bottom:1px solid var(--line);
+    }
+    .video-filter label {
+      display:block;
+      margin-bottom:5px;
+      color:var(--muted);
+      font-size:10px;
+      font-weight:900;
+    }
+    .video-filter select {
+      width:100%;
+      min-height:40px;
+      padding:0 10px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      font-size:12px;
+      font-weight:900;
+    }
+    .video-count {
+      justify-self:end;
+      min-height:40px;
+      padding:0 12px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:8px;
+      color:#9c1f1f;
+      background:#fff0f0;
+      font-size:11px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .video-slider { padding:14px 16px 16px; background:#fff; }
+    .video-track {
+      display:flex;
+      gap:12px;
+      overflow:auto;
+      scroll-snap-type:x mandatory;
+      padding-bottom:6px;
+    }
+    .video-card {
+      flex:0 0 min(330px,84vw);
+      min-height:360px;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:inherit;
+      background:#fff;
+      text-decoration:none;
+      scroll-snap-align:start;
+    }
+    .video-thumb {
+      position:relative;
+      height:180px;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      color:#fff;
+      background:linear-gradient(145deg,#15191d,#30363d);
+      font-size:12px;
+      font-weight:900;
+      text-align:center;
+    }
+    .video-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+    .video-thumb::after {
+      content:"▶";
+      position:absolute;
+      right:12px;
+      bottom:12px;
+      width:38px;
+      height:38px;
+      display:grid;
+      place-items:center;
+      border-radius:999px;
+      color:#fff;
+      background:var(--red);
+      font-size:15px;
+      box-shadow:0 10px 24px rgba(0,0,0,.28);
+    }
+    .video-body {
+      flex:1;
+      padding:13px;
+      display:flex;
+      flex-direction:column;
+      gap:9px;
+    }
+    .video-body span { color:var(--muted); font-size:10px; font-weight:900; }
+    .video-body strong { color:var(--coal); font-size:15px; line-height:1.35; }
+    .video-body p { margin:0; color:var(--muted); font-size:11px; line-height:1.55; }
+    .video-tags { display:flex; flex-wrap:wrap; gap:5px; }
+    .video-tags em {
+      padding:4px 7px;
+      border-radius:999px;
+      color:#9c1f1f;
+      background:#fff0f0;
+      font-size:9px;
+      font-style:normal;
+      font-weight:900;
+    }
+    .video-link-text {
+      margin-top:auto;
+      color:var(--red);
+      font-size:11px;
+      font-weight:900;
+    }
+    .video-empty {
+      min-height:180px;
+      display:grid;
+      place-items:center;
+      border:1px dashed var(--line);
+      border-radius:8px;
+      color:var(--muted);
+      background:#fafafa;
+      font-size:12px;
+      font-weight:900;
+      text-align:center;
+    }
     .photo-section { margin-top:18px; border:1px solid var(--line); border-radius:8px; background:#111; box-shadow:var(--shadow); overflow:hidden; }
     .photo-head {
       min-height:64px;
@@ -488,6 +707,8 @@
       .exercise-form { grid-template-columns:1fr 1fr; }
       .save-btn { grid-column:1/-1; }
       .chart-cards { grid-template-columns:repeat(2,1fr); }
+      .video-filters { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .video-count { justify-self:stretch; }
       .photo-stage { grid-template-columns:1fr; }
       .photo-stage img { height:330px; }
     }
@@ -507,6 +728,10 @@
       .body-map { grid-template-columns:1fr; }
       .top-actions .primary-btn { display:none; }
       .chart-cards { grid-template-columns:1fr; }
+      .video-head { flex-direction:column; }
+      .video-filters { grid-template-columns:1fr; }
+      .video-count { justify-self:stretch; }
+      .video-card { flex-basis:82vw; }
       .photo-head { flex-direction:column; }
       .slider-actions { width:100%; justify-content:space-between; }
       .photo-stage img { height:280px; }
@@ -527,6 +752,7 @@
         </div>
         <div class="top-actions">
           <button class="icon-btn" type="button" id="resetBtn" title="サンプルに戻す">↺</button>
+          <a class="primary-btn" href="theory.html">超回復理論</a>
           <a class="primary-btn" href="photos.html">写真記録</a>
           <button class="primary-btn" type="button" id="quickAddBtn">今日の筋トレ</button>
         </div>
@@ -549,13 +775,13 @@
           <div class="hero-copy">
             <div>
               <span class="kicker">WEEKLY MUSCLE QUEST</span>
-              <h1>週3回、強くなる記録を積み上げる。</h1>
-              <p>重量・回数・部位の伸びを見える化して、前回の自分に勝った瞬間をポイントに変える筋トレ習慣アプリ。</p>
+              <h1>休ませながら、毎日続く体を作る。</h1>
+              <p>重量よりも継続リズムを重視。部位ごとに1日休んで2日目に戻るのをベスト、2日休んで3日目までは許容として見る筋トレ習慣アプリ。</p>
             </div>
             <div class="hero-metrics">
               <div class="hero-metric"><span>今週</span><strong id="heroWeek">0 / 3</strong></div>
               <div class="hero-metric"><span>ポイント</span><strong id="heroPoints">0 pt</strong></div>
-              <div class="hero-metric"><span>自己ベスト</span><strong id="heroBest">0</strong></div>
+              <div class="hero-metric"><span>種目数</span><strong id="heroBest">0</strong></div>
             </div>
           </div>
           <div class="muscle-visual">
@@ -569,15 +795,15 @@
         <section class="panel" id="week">
           <div class="panel-head">
             <div>
-              <h2>週3チャレンジ</h2>
-              <p>筋トレ実行日を週単位で集計</p>
+              <h2>休息リズムチャレンジ</h2>
+              <p>毎日どこかの部位を動かし、同じ部位は休ませる</p>
             </div>
-            <span class="pill" id="weekPill">あと3回</span>
+            <span class="pill" id="weekPill">あと7日</span>
           </div>
           <div class="panel-body">
             <div class="week-grid" id="weekGrid"></div>
             <div class="progress-line"><span id="weekFill"></span></div>
-            <div class="week-summary"><span id="weekText">今週 0 回</span><span id="weekBonus">週3達成で +30pt</span></div>
+            <div class="week-summary"><span id="weekText">今週 0 日</span><span id="weekBonus">7日リズム達成で +120pt</span></div>
           </div>
         </section>
 
@@ -638,20 +864,20 @@
         <section class="panel" id="chart">
           <div class="panel-head">
             <div>
-              <h2>部位別成長グラフ</h2>
-              <p id="chartCaption">今週の合計ボリュームと前回超えをまとめて確認</p>
+              <h2>休息・継続グラフ</h2>
+              <p id="chartCaption">部位ごとに、いつ実施したかと重量・回数・休息間隔を確認</p>
             </div>
-            <span class="pill" id="chartPill">週</span>
+            <span class="pill" id="chartPill">週・休息</span>
           </div>
           <div class="panel-body">
             <div class="chart-shell">
               <div class="chart-mode" id="chartMode" aria-label="グラフ期間">
-                <button type="button" data-chart-mode="day">日</button>
-                <button type="button" data-chart-mode="week">週</button>
-                <button type="button" data-chart-mode="month">月</button>
+                <button type="button" data-chart-mode="week">7日</button>
+                <button type="button" data-chart-mode="twoWeeks">14日</button>
+                <button type="button" data-chart-mode="month">30日</button>
               </div>
               <div class="chart-frame">
-                <svg id="partChart" viewBox="0 0 760 300" role="img" aria-label="部位別トレーニング成長グラフ"></svg>
+                <div id="partChart" role="img" aria-label="部位別の実施日と休息間隔グラフ"></div>
               </div>
               <div class="chart-cards" id="chartCards"></div>
             </div>
@@ -664,7 +890,7 @@
           <div class="panel-body">
             <h2>今週の筋肉</h2>
             <blockquote>「筋肉は裏切らない。記録はもっと裏切らない。」</blockquote>
-            <p>今週は背中。懸垂・ローイング・デッドリフト系を1回でも入れると、厚みづくりにポイント加算。</p>
+            <p>今週は背中。胸や脚だけに偏らず、空きすぎた部位を戻すと休息リズムが整います。</p>
           </div>
         </section>
 
@@ -672,7 +898,7 @@
           <div class="panel-head">
             <div>
               <h2>レベル</h2>
-              <p>継続と成長でランクアップ</p>
+              <p>休息リズムと継続でランクアップ</p>
             </div>
           </div>
           <div class="panel-body">
@@ -683,6 +909,7 @@
                 <h3 id="levelName">フォーム見習い</h3>
                 <p id="levelMessage">今日の1セットが、次のレベルの材料になる。</p>
                 <a class="level-link" href="levels.html">ポイント・レベル表を見る</a>
+                <a class="level-link" href="theory.html">超回復の理論を見る</a>
               </div>
             </div>
           </div>
@@ -713,6 +940,35 @@
         </section>
       </aside>
     </div>
+
+    <!-- YouTube動画スライダーは、動画リスト充実後に復活予定。
+    <section class="video-section" id="videos">
+      <div class="video-head">
+        <div>
+          <h2>Training YouTube Slider</h2>
+          <p>Googleドキュメントの動画リストをもとに、目的と部位で必要なトレーニング動画を選べます。</p>
+        </div>
+        <div class="slider-actions">
+          <button type="button" id="prevVideo" aria-label="前の動画">‹</button>
+          <button type="button" id="nextVideo" aria-label="次の動画">›</button>
+        </div>
+      </div>
+      <div class="video-filters">
+        <div class="video-filter">
+          <label for="videoPurpose">目的</label>
+          <select id="videoPurpose"></select>
+        </div>
+        <div class="video-filter">
+          <label for="videoPart">部位</label>
+          <select id="videoPart"></select>
+        </div>
+        <div class="video-count" id="videoCount">0本</div>
+      </div>
+      <div class="video-slider">
+        <div class="video-track" id="videoTrack"></div>
+      </div>
+    </section>
+    -->
 
     <section class="photo-section" id="photos">
       <div class="photo-head">
@@ -754,11 +1010,16 @@
     (() => {
       const parts = ["胸","背中","肩","腕","脚","腹","全身"];
       const levels = [
-        { level:1, points:0, name:"フォーム見習い" },
-        { level:2, points:120, name:"週3チャレンジャー" },
-        { level:3, points:260, name:"継続ビルダー" },
-        { level:4, points:420, name:"重量ハンター" },
-        { level:5, points:620, name:"筋肉クエスト王" }
+        { level:1, points:0, name:"リズム開始" },
+        { level:2, points:80, name:"休息メモ係" },
+        { level:3, points:180, name:"週リズム見習い" },
+        { level:4, points:320, name:"部位ローテーター" },
+        { level:5, points:500, name:"継続ビルダー" },
+        { level:6, points:720, name:"休息マスター" },
+        { level:7, points:980, name:"7日リズム職人" },
+        { level:8, points:1280, name:"習慣アスリート" },
+        { level:9, points:1620, name:"部位管理プロ" },
+        { level:10, points:2000, name:"筋肉クエスト王" }
       ];
       const musclePhotos = [
         {
@@ -832,6 +1093,145 @@
           img:"https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?auto=format&fit=crop&w=1200&q=80"
         }
       ];
+      const videoPurposes = ["すべて","初心者","脂肪燃焼","腹筋強化","上半身強化","下半身強化","柔軟性","姿勢改善","ヨガ・回復","バルクアップ"];
+      const videoParts = ["すべて","胸","背中","肩","腕","脚","腹","全身","体幹","股関節"];
+      const trainingVideos = [
+        {
+          channel:"ザ・きんにくTV",
+          title:"世界一楽なスクワット",
+          url:"https://www.youtube.com/watch?v=pYmQBwba6wU",
+          parts:["脚","下半身"],
+          purposes:["初心者","下半身強化"],
+          intensity:"極低強度",
+          note:"運動不足解消と下半身の筋力維持。膝への負担を抑えたい日向け。"
+        },
+        {
+          channel:"ザ・きんにくTV",
+          title:"世界一楽な筋トレ＆有酸素運動 全身10分間",
+          url:"https://www.youtube.com/watch?v=hMSUxAJHwyc",
+          parts:["全身","脚","腹"],
+          purposes:["初心者","脂肪燃焼"],
+          intensity:"低〜中強度",
+          note:"全身を動かして心肺機能と脂肪燃焼を狙う、始めやすい10分メニュー。"
+        },
+        {
+          channel:"Marina Takewaki",
+          title:"地獄の11分 マンションOK！飛ばない脂肪燃焼ダンス",
+          url:"https://www.youtube.com/watch?v=KxzZJwmB8qc",
+          parts:["全身","脚","腹"],
+          purposes:["脂肪燃焼"],
+          intensity:"中〜高強度",
+          note:"ジャンプなしで騒音を抑えながら、全身の心拍を上げる脂肪燃焼系。"
+        },
+        {
+          channel:"のがちゃんねる",
+          title:"シックスパックを作る腹筋トレーニング 毎日2分",
+          url:"https://www.youtube.com/watch?v=hiBD-lIC6lU",
+          parts:["腹","体幹"],
+          purposes:["腹筋強化","バルクアップ"],
+          intensity:"高強度",
+          note:"2分で腹直筋・腹斜筋を短く追い込む、腹筋の見た目づくり向け。"
+        },
+        {
+          channel:"のがちゃんねる",
+          title:"毎日2分間 下腹部引き締め腹筋",
+          url:"https://www.youtube.com/watch?v=nQeWZoC-v78",
+          parts:["腹","体幹"],
+          purposes:["腹筋強化","姿勢改善"],
+          intensity:"中〜高強度",
+          note:"下腹部・腸腰筋・インナーコアを狙い、ぽっこりお腹対策に使いやすい。"
+        },
+        {
+          channel:"オガトレ",
+          title:"開脚のための時短ストレッチルーティン",
+          url:"https://www.youtube.com/watch?v=NJgUP7P1Fsg",
+          parts:["脚","股関節"],
+          purposes:["柔軟性","姿勢改善"],
+          intensity:"低〜中強度",
+          note:"大臀筋・腿裏・内転筋を順番に伸ばし、股関節の可動域を広げる。"
+        },
+        {
+          channel:"メトロンブログ",
+          title:"全方位から腹筋が割れる短期集中型 1日2分or4分",
+          url:"https://www.youtube.com/watch?v=sM3W0b1PdOY",
+          parts:["腹","体幹"],
+          purposes:["腹筋強化","バルクアップ"],
+          intensity:"極高強度",
+          note:"短時間で腹筋群を高密度に追い込む、中〜上級者向けの腹筋メニュー。"
+        },
+        {
+          channel:"ズボラストレッチ",
+          title:"内ももの付け根の脂肪だけ狙い撃ち",
+          url:"https://www.youtube.com/watch?v=vopCOGX8IEs",
+          parts:["脚","股関節"],
+          purposes:["初心者","下半身強化","柔軟性"],
+          intensity:"低強度",
+          note:"寝たままで内転筋群と股関節周りを動かす、始めるハードルが低い動画。"
+        },
+        {
+          channel:"山澤礼明",
+          title:"自重とダンベルで行う上半身集中トレーニング",
+          url:"https://www.youtube.com/watch?v=55qFFpKkTM0",
+          parts:["胸","肩","腕"],
+          purposes:["上半身強化","バルクアップ"],
+          intensity:"中〜高強度",
+          note:"胸・肩・腕を自宅でまとめて鍛える、上半身の厚みづくり向け。"
+        },
+        {
+          channel:"B-life",
+          title:"寝たままベッドの上でもできる朝ヨガ",
+          url:"https://www.youtube.com/watch?v=Q6Gkf5kKeus",
+          parts:["全身","股関節","背中"],
+          purposes:["ヨガ・回復","姿勢改善","柔軟性"],
+          intensity:"低強度",
+          note:"起床直後の関節可動性と呼吸を整える、休息日にも使いやすい朝ヨガ。"
+        },
+        {
+          channel:"B-life",
+          title:"10分間 朝ヨガ全身ストレッチ",
+          url:"https://www.youtube.com/watch?v=m5j9hIK2rT0",
+          parts:["全身","脚","股関節"],
+          purposes:["ヨガ・回復","柔軟性"],
+          intensity:"低〜中強度",
+          note:"全身の血流促進と腸腰筋まわりのストレッチに向く10分フロー。"
+        },
+        {
+          channel:"Yoga With Adriene",
+          title:"Yoga for Neck, Shoulders, Upper Back",
+          url:"https://www.youtube.com/results?search_query=Yoga+With+Adriene+Yoga+for+Neck+Shoulders+Upper+Back",
+          parts:["肩","背中"],
+          purposes:["姿勢改善","ヨガ・回復","柔軟性"],
+          intensity:"低強度",
+          note:"首・肩・背中の緊張をゆるめる、デスクワーク後に使いやすいヨガ検索リンク。"
+        },
+        {
+          channel:"MadFit",
+          title:"Low Impact FULL BODY HIIT Workout",
+          url:"https://www.youtube.com/results?search_query=MadFit+Low+Impact+FULL+BODY+HIIT+No+Equipment+No+Jumping",
+          parts:["全身"],
+          purposes:["脂肪燃焼"],
+          intensity:"中〜高強度",
+          note:"ジャンプなしで全身を動かす低衝撃HIIT。膝や騒音が気になる日に。"
+        },
+        {
+          channel:"blogilates",
+          title:"POP Pilates Top Hits",
+          url:"https://www.youtube.com/results?search_query=blogilates+POP+Pilates+Top+Hits",
+          parts:["腹","脚","全身"],
+          purposes:["脂肪燃焼","腹筋強化"],
+          intensity:"高強度",
+          note:"音楽に合わせてピラティス動作を続ける、引き締めと持久力向け。"
+        },
+        {
+          channel:"Pamela Reif",
+          title:"15 MIN BOOTY WORKOUT LOW IMPACT",
+          url:"https://www.youtube.com/results?search_query=Pamela+Reif+15+MIN+BOOTY+WORKOUT+LOW+IMPACT+knee+friendly",
+          parts:["脚","股関節"],
+          purposes:["下半身強化","バルクアップ"],
+          intensity:"高強度",
+          note:"膝に配慮しながら大臀筋・中臀筋・腿裏を狙う美尻系メニュー。"
+        }
+      ];
       const sampleLogs = [
         { date:"2026-06-02", part:"胸", exercise:"ベンチプレス", weight:50, reps:8, sets:3 },
         { date:"2026-06-03", part:"背中", exercise:"ラットプルダウン", weight:37.5, reps:10, sets:3 },
@@ -848,8 +1248,8 @@
         { date:"2026-06-25", part:"胸", exercise:"ベンチプレス", weight:60, reps:8, sets:3 },
         { date:"2026-06-25", part:"腹", exercise:"クランチ", weight:0, reps:25, sets:3 }
       ];
-      const state = { logs:[...sampleLogs], selectedPart:"胸", activePhoto:0, chartMode:"week" };
-      const today = "2026-06-25";
+      const state = { logs:[...sampleLogs], selectedPart:"胸", activePhoto:0, chartMode:"week", videoPurpose:"すべて", videoPart:"すべて" };
+      const today = "2026-06-27";
       const $ = id => document.getElementById(id);
       const fmt = n => Number(n).toLocaleString("ja-JP");
       function weekDates() {
@@ -859,32 +1259,52 @@
         const names = ["月","火","水","木","金","土","日"];
         return names[weekDates().indexOf(date)] || "";
       }
+      function dateToISO(date) {
+        const copy = new Date(date);
+        copy.setMinutes(copy.getMinutes() - copy.getTimezoneOffset());
+        return copy.toISOString().slice(0,10);
+      }
+      function addDays(dateText, amount) {
+        const date = new Date(`${dateText}T00:00:00`);
+        date.setDate(date.getDate() + amount);
+        return dateToISO(date);
+      }
+      function dateRange(start, end) {
+        const dates = [];
+        for (let date = start; date <= end; date = addDays(date, 1)) dates.push(date);
+        return dates;
+      }
+      function shortDate(date) {
+        const dateObj = new Date(`${date}T00:00:00`);
+        const dayName = ["日","月","火","水","木","金","土"][dateObj.getDay()];
+        return { day:date.slice(8), label:dayName };
+      }
       function dayLogs(date) {
         return state.logs.filter(log => log.date === date);
       }
       function rangeForChart() {
-        if (state.chartMode === "day") {
+        const days = weekDates();
+        if (state.chartMode === "twoWeeks") {
           return {
-            label:"日",
-            start:today,
-            end:today,
-            caption:"今日の部位別ボリュームと前回超えを確認"
+            label:"14日",
+            start:addDays(days[0], -7),
+            end:days[days.length - 1],
+            caption:"直近2週の部位別リズム、重量・回数、休息間隔を確認"
           };
         }
         if (state.chartMode === "month") {
           return {
-            label:"月",
+            label:"30日",
             start:"2026-06-01",
             end:"2026-06-30",
-            caption:"今月の部位別ボリュームと伸びをまとめて確認"
+            caption:"今月の部位別リズムと、休みすぎ・詰めすぎを確認"
           };
         }
-        const days = weekDates();
         return {
-          label:"週",
+          label:"7日",
           start:days[0],
           end:days[days.length - 1],
-          caption:"今週の合計ボリュームと前回超えをまとめて確認"
+          caption:"今週のどの日にどの部位をやったか、重量・回数と休息状態を確認"
         };
       }
       function logsInRange(start, end) {
@@ -916,17 +1336,44 @@
           return { part, logs, volume, improved, best };
         });
       }
-      function points() {
-        let total = state.logs.length * 10;
-        if (workoutDays().length >= 3) total += 30;
-        state.logs.forEach((log,index) => {
-          const prev = previousFor(log,index);
-          if (!prev) return;
-          if (Number(log.weight) > Number(prev.weight)) total += 8;
-          if (Number(log.reps) > Number(prev.reps)) total += 5;
+      function pointBreakdown() {
+        const bodyParts = parts.filter(part => part !== "全身");
+        const weekDone = workoutDays();
+        const partIntervals = bodyParts.flatMap(part => {
+          const dates = trainingDatesForPart(part).filter(date => date <= today);
+          return dates.slice(1).map((date,index) => ({
+            part,
+            interval:dateDiffDays(date, dates[index])
+          }));
         });
-        total += new Set(state.logs.map(log => log.exercise)).size * 3;
-        return total;
+        const bestIntervals = partIntervals.filter(item => item.interval === 2);
+        const okIntervals = partIntervals.filter(item => item.interval === 3);
+        const optimalIntervals = [...bestIntervals, ...okIntervals];
+        const tooShortIntervals = partIntervals.filter(item => item.interval === 1);
+        const staleParts = bodyParts.filter(part => {
+          const dates = trainingDatesForPart(part).filter(date => date <= today);
+          if (!dates.length) return false;
+          return dateDiffDays(today, dates.at(-1)) >= 4;
+        });
+        const weekPartsByDay = weekDates().map(date => dayLogs(date).map(log => log.part).filter(part => part !== "全身"));
+        const everyDayDone = weekPartsByDay.every(day => day.length > 0);
+        const noSamePartNextDay = weekPartsByDay.slice(1).every((day,index) => {
+          const prev = weekPartsByDay[index];
+          return day.every(part => !prev.includes(part));
+        });
+        const sevenDayRhythm = everyDayDone && noSamePartNextDay;
+        const base = state.logs.length * 6;
+        const activeDayBonus = weekDone.length * 8;
+        const intervalBonus = bestIntervals.length * 18 + okIntervals.length * 10;
+        const varietyBonus = new Set(state.logs.map(log => log.part).filter(part => part !== "全身")).size * 10;
+        const sevenDayBonus = sevenDayRhythm ? 120 : 0;
+        const shortPenalty = tooShortIntervals.length * 8;
+        const stalePenalty = staleParts.length * 15;
+        const total = Math.max(0, base + activeDayBonus + intervalBonus + varietyBonus + sevenDayBonus - shortPenalty - stalePenalty);
+        return { total, base, activeDayBonus, intervalBonus, varietyBonus, sevenDayBonus, shortPenalty, stalePenalty, staleParts, bestIntervals, okIntervals, optimalIntervals, sevenDayRhythm };
+      }
+      function points() {
+        return pointBreakdown().total;
       }
       function currentLevel() {
         const p = points();
@@ -951,11 +1398,12 @@
           return `<div class="day ${isDone ? "done" : ""}"><span>${label}</span><strong>${isDone ? "✓" : "·"}</strong><em>${logs.length ? `${logs.length}種目` : date.slice(8)}</em></div>`;
         }).join("");
         const count = done.length;
-        $("weekFill").style.width = Math.min(100, count / 3 * 100) + "%";
-        $("weekText").textContent = `今週 ${count} 回`;
-        $("weekPill").textContent = count >= 3 ? "達成済み" : `あと${3 - count}回`;
-        $("weekBonus").textContent = count >= 3 ? "週3ボーナス +30pt 獲得" : "週3達成で +30pt";
-        $("heroWeek").textContent = `${count} / 3`;
+        const rhythm = pointBreakdown();
+        $("weekFill").style.width = Math.min(100, count / 7 * 100) + "%";
+        $("weekText").textContent = `今週 ${count} 日`;
+        $("weekPill").textContent = rhythm.sevenDayRhythm ? "7日達成" : `あと${7 - count}日`;
+        $("weekBonus").textContent = rhythm.sevenDayRhythm ? "7日リズム特別 +120pt 獲得" : "7日リズム達成で +120pt";
+        $("heroWeek").textContent = `${count} / 7`;
       }
       function dateDiffDays(later, earlier) {
         const oneDay = 24 * 60 * 60 * 1000;
@@ -968,15 +1416,24 @@
         const banner = $("trainerBanner");
         let mood = "";
         let status = "順調";
-        let title = "週3ペース、かなりいい流れ。";
-        let text = "今週はもう習慣の土台ができています。次は重量か回数を1つだけ伸ばして、前回の自分に勝とう。";
-        if (count >= 3) {
+        const breakdown = pointBreakdown();
+        let title = "休息リズム、かなりいい流れ。";
+        let text = "重さより、同じ部位を休ませて戻ってくることを優先しよう。1日休息して2日目に戻るのがベスト、疲労が強ければ2日休息も許容です。";
+        if (breakdown.staleParts.length) {
+          mood = "danger";
+          status = "空き注意";
+          title = `${breakdown.staleParts.join("・")}が空き気味。`;
+          text = "丸3日以上休みっぱなしの部位はポイントダウン対象です。今日は軽めでも、その部位を1種目だけ戻すとリズムが復活します。";
+        } else if (breakdown.sevenDayRhythm) {
           mood = "";
+          status = "7日達成";
+          title = "毎日できて、部位も休ませられている。";
+          text = "7日リズム特別ポイント獲得。重量よりも、休息を入れながら続けたことが一番強いです。";
         } else if (count >= 1 && gap <= 2) {
           mood = "warning";
-          status = `あと${3 - count}回`;
+          status = `あと${7 - count}日`;
           title = "流れは切れてない。ここで次の1回。";
-          text = `今週は${count}回できています。短くてもいいので、今日は1種目だけ入れると週3が一気に近づきます。`;
+          text = `今週は${count}日できています。同じ部位を連続させず、今日は別部位を1種目だけ入れると休息リズムが整います。`;
         } else if (gap >= 3) {
           mood = "danger";
           status = "再スタート";
@@ -1039,43 +1496,117 @@
           btn.classList.toggle("active", btn.dataset.chartMode === state.chartMode);
         });
       }
+      function escapeHtml(text) {
+        return String(text || "").replace(/[&<>"']/g, char => ({
+          "&":"&amp;",
+          "<":"&lt;",
+          ">":"&gt;",
+          "\"":"&quot;",
+          "'":"&#39;"
+        })[char]);
+      }
+      function strongestLog(logs) {
+        return [...logs].sort((a,b) => {
+          const weightDiff = Number(b.weight) - Number(a.weight);
+          if (weightDiff) return weightDiff;
+          return Number(b.reps) - Number(a.reps);
+        })[0];
+      }
+      function partGroupLabel(part) {
+        if (["胸","背中","肩","腕"].includes(part)) return "上半身";
+        if (part === "脚") return "下半身";
+        if (part === "腹") return "体幹";
+        return "全身";
+      }
+      function latestLogForPart(part) {
+        return [...state.logs].filter(log => log.part === part).sort((a,b) => b.date.localeCompare(a.date))[0] || null;
+      }
+      function trainingDatesForPart(part) {
+        return [...new Set(state.logs.filter(log => log.part === part).map(log => log.date))].sort();
+      }
+      function partRecoveryStatus(part) {
+        const dates = trainingDatesForPart(part).filter(date => date <= today);
+        if (!dates.length) {
+          return { className:"empty", label:"未記録", detail:"まず1回記録" };
+        }
+        const latest = dates.at(-1);
+        const gap = dateDiffDays(today, latest);
+        const intervals = dates.slice(1).map((date,index) => dateDiffDays(date, dates[index]));
+        const latestInterval = intervals.at(-1) || null;
+        if (latestInterval === 1) {
+          return { className:"short", label:"休息短い", detail:"同部位が連日" };
+        }
+        if (gap >= 4) {
+          return { className:"long", label:"空きすぎ", detail:`最終から${gap}日` };
+        }
+        if (latestInterval && latestInterval >= 4) {
+          return { className:"long", label:"間隔長め", detail:`前回間隔${latestInterval}日` };
+        }
+        if (!latestInterval) {
+          return { className:"good", label:"記録開始", detail:`最終から${gap}日` };
+        }
+        if (latestInterval === 2) {
+          return { className:"good", label:"ベスト", detail:"1日休息→2日目" };
+        }
+        if (latestInterval === 3) {
+          return { className:"good", label:"許容", detail:"2日休息→3日目" };
+        }
+        return { className:"good", label:"良い間隔", detail:`前回間隔${latestInterval}日` };
+      }
+      function rhythmSummary() {
+        const tracked = state.logs
+          .filter(log => ["胸","背中","肩","腕","脚"].includes(log.part))
+          .map(log => ({ date:log.date, group:partGroupLabel(log.part) }))
+          .sort((a,b) => a.date.localeCompare(b.date));
+        const byDate = [...new Map(tracked.map(item => [item.date, item])).values()].filter(item => item.group === "上半身" || item.group === "下半身");
+        if (byDate.length < 2) return { label:"判定待ち", detail:"上半身/下半身を2回以上記録" };
+        const recent = byDate.slice(-6);
+        const switches = recent.slice(1).filter((item,index) => item.group !== recent[index].group).length;
+        const intervals = recent.slice(1).map((item,index) => dateDiffDays(item.date, recent[index].date));
+        const maxGap = Math.max(...intervals);
+        if (switches === recent.length - 1 && maxGap <= 2) return { label:"交互リズム良好", detail:"上半身/下半身がほぼ交互" };
+        if (maxGap >= 4) return { label:"間隔空き気味", detail:`最大${maxGap}日空き` };
+        return { label:"偏り注意", detail:"同じ側が続いている日あり" };
+      }
       function renderPartChart() {
         const range = rangeForChart();
-        const stats = partStats(range);
-        $("chartPill").textContent = `${range.label}・kg × 回数 × セット`;
+        const dates = dateRange(range.start, range.end);
+        $("chartPill").textContent = `${range.label}・重量 / 回数 / 休息`;
         $("chartCaption").textContent = range.caption;
-        const max = Math.max(...stats.map(stat => stat.volume), 1);
-        const chartWidth = 760;
-        const chartHeight = 300;
-        const left = 54;
-        const bottom = 246;
-        const barGap = 14;
-        const barWidth = (chartWidth - left - 32 - barGap * (stats.length - 1)) / stats.length;
-        let html = `<line x1="${left}" y1="28" x2="${left}" y2="${bottom}" stroke="#dfe3e6"/>
-          <line x1="${left}" y1="${bottom}" x2="730" y2="${bottom}" stroke="#dfe3e6"/>`;
-        for (let i = 0; i <= 4; i++) {
-          const y = bottom - i * 50;
-          const value = Math.round(max * i / 4);
-          html += `<line x1="${left}" y1="${y}" x2="730" y2="${y}" stroke="#eef0f2"/>
-            <text x="44" y="${y + 4}" text-anchor="end" fill="#6f757c" font-size="11">${fmt(value)}</text>`;
-        }
-        stats.forEach((stat,index) => {
-          const x = left + 12 + index * (barWidth + barGap);
-          const height = Math.max(4, stat.volume / max * 190);
-          const y = bottom - height;
-          const color = stat.improved ? "#d63838" : "#202428";
-          html += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barWidth.toFixed(1)}" height="${height.toFixed(1)}" rx="7" fill="${color}"/>
-            <text x="${(x + barWidth / 2).toFixed(1)}" y="${Math.max(22, y - 9).toFixed(1)}" text-anchor="middle" fill="${color}" font-size="12" font-weight="900">${fmt(stat.volume)}</text>
-            <text x="${(x + barWidth / 2).toFixed(1)}" y="270" text-anchor="middle" fill="#202428" font-size="12" font-weight="900">${stat.part}</text>
-            <text x="${(x + barWidth / 2).toFixed(1)}" y="288" text-anchor="middle" fill="#6f757c" font-size="10">${stat.improved ? `前回超え${stat.improved}` : `${stat.logs.length}種目`}</text>`;
-        });
-        $("partChart").innerHTML = html;
-        $("chartCards").innerHTML = stats
-          .filter(stat => stat.logs.length)
-          .sort((a,b) => b.volume - a.volume)
-          .slice(0,4)
-          .map(stat => `<div class="chart-card"><span>${stat.part}</span><strong>${fmt(stat.volume)}kg</strong><em>${stat.improved ? `前回超え ${stat.improved}件` : `最高 ${fmt(stat.best)}kg`}</em></div>`)
-          .join("") || `<div class="chart-card"><span>${range.label}</span><strong>記録なし</strong><em>筋トレを保存すると表示</em></div>`;
+        const columns = `92px repeat(${dates.length}, minmax(68px,1fr)) 126px`;
+        const head = `<div class="recovery-row head" style="grid-template-columns:${columns}">
+          <div class="recovery-date">部位</div>
+          ${dates.map(date => {
+            const label = shortDate(date);
+            return `<div class="recovery-date"><strong>${label.day}</strong><span>${label.label}</span></div>`;
+          }).join("")}
+          <div class="recovery-date">休息状態</div>
+        </div>`;
+        const rows = parts.map(part => {
+          const status = partRecoveryStatus(part);
+          const cells = dates.map(date => {
+            const logs = state.logs.filter(log => log.part === part && log.date === date);
+            if (!logs.length) return `<div class="recovery-cell">休</div>`;
+            const top = strongestLog(logs);
+            const rawExercise = top.exercise.length > 7 ? `${top.exercise.slice(0,7)}…` : top.exercise;
+            const exercise = escapeHtml(rawExercise);
+            return `<div class="recovery-cell done"><strong>${top.weight}kg</strong><span>${top.reps}回</span><em>${exercise}${logs.length > 1 ? ` +${logs.length - 1}` : ""}</em></div>`;
+          }).join("");
+          return `<div class="recovery-row" style="grid-template-columns:${columns}">
+            <div class="recovery-label">${part}<span>${partGroupLabel(part)}</span></div>
+            ${cells}
+            <div class="recovery-state ${status.className}"><strong>${status.label}</strong><span>${status.detail}</span></div>
+          </div>`;
+        }).join("");
+        $("partChart").innerHTML = `<div class="recovery-chart">${head}${rows}</div>`;
+        const rhythm = rhythmSummary();
+        const statusCards = parts.map(part => {
+          const status = partRecoveryStatus(part);
+          const latest = latestLogForPart(part);
+          const latestText = latest ? `${escapeHtml(latest.exercise)} ${latest.weight}kg × ${latest.reps}回` : "未記録";
+          return `<div class="chart-card"><span>${part}・${partGroupLabel(part)}</span><strong>${status.label}</strong><em>${latestText}</em></div>`;
+        }).join("");
+        $("chartCards").innerHTML = `<div class="chart-card"><span>上半身 / 下半身</span><strong>${rhythm.label}</strong><em>${rhythm.detail}</em></div>${statusCards}`;
       }
       function renderLevel() {
         const status = currentLevel();
@@ -1087,24 +1618,60 @@
         $("levelName").textContent = status.current.name;
         $("levelSub").textContent = status.next ? `${status.points - base} / ${target - base} pt` : `${status.points} pt`;
         $("levelRing").style.background = `conic-gradient(var(--red) ${pct * 3.6}deg,#e6eaee 0)`;
-        $("levelMessage").textContent = status.next ? `次のレベルまであと ${status.next.points - status.points}pt。` : "最上位レベル。あとは記録を厚くするだけ。";
+        $("levelMessage").textContent = status.next ? `次のレベルまであと ${status.next.points - status.points}pt。休息リズムで上げよう。` : "最上位レベル。部位ごとの休息管理まで完成形。";
         $("heroBest").textContent = [...new Set(state.logs.map(log => log.exercise))].length;
       }
       function renderReport() {
         const count = workoutDays().length;
-        const top = [...state.logs].sort((a,b) => tonnage(b) - tonnage(a))[0];
-        const improved = state.logs.filter((log,index) => {
-          const prev = previousFor(log,index);
-          return prev && (Number(log.weight) > Number(prev.weight) || Number(log.reps) > Number(prev.reps));
-        }).length;
+        const breakdown = pointBreakdown();
         $("report").textContent = [
           "【YUDAI Muscle Quest】",
-          `今週の筋トレ：${count}/3回`,
-          `ポイント：${points()}pt`,
-          `成長記録：前回超え ${improved}件`,
-          top ? `最大ボリューム：${top.exercise} ${fmt(tonnage(top))}kg` : "最大ボリューム：未記録",
-          count >= 3 ? "週3達成。次は重量か回数を1つ伸ばす。" : `あと${3 - count}回で週3達成。`
+          `今週の実行日：${count}/7日`,
+          `ポイント：${breakdown.total}pt`,
+          `ベスト間隔：${breakdown.bestIntervals.length}件`,
+          `許容間隔：${breakdown.okIntervals.length}件`,
+          `空きすぎ部位：${breakdown.staleParts.length ? breakdown.staleParts.join("・") : "なし"}`,
+          breakdown.sevenDayRhythm ? "7日リズム達成。休息を入れながら毎日実行できています。" : `あと${7 - count}日で7日リズム達成。`
         ].join("\n");
+      }
+      function videoId(url) {
+        const match = url.match(/[?&]v=([^&]+)/);
+        return match ? match[1] : "";
+      }
+      function filteredVideos() {
+        return trainingVideos.filter(video => {
+          const purposeOk = state.videoPurpose === "すべて" || video.purposes.includes(state.videoPurpose);
+          const partOk = state.videoPart === "すべて" || video.parts.includes(state.videoPart);
+          return purposeOk && partOk;
+        });
+      }
+      function renderVideoFilters() {
+        $("videoPurpose").innerHTML = videoPurposes.map(purpose => `<option ${purpose === state.videoPurpose ? "selected" : ""}>${purpose}</option>`).join("");
+        $("videoPart").innerHTML = videoParts.map(part => `<option ${part === state.videoPart ? "selected" : ""}>${part}</option>`).join("");
+        $("videoPurpose").value = state.videoPurpose;
+        $("videoPart").value = state.videoPart;
+      }
+      function renderVideoSlider() {
+        const videos = filteredVideos();
+        $("videoCount").textContent = `${videos.length}本`;
+        if (!videos.length) {
+          $("videoTrack").innerHTML = `<div class="video-empty">条件に合う動画がありません。目的か部位を変えてください。</div>`;
+          return;
+        }
+        $("videoTrack").innerHTML = videos.map(video => {
+          const id = videoId(video.url);
+          const thumb = id ? `<img src="https://img.youtube.com/vi/${id}/hqdefault.jpg" alt="">` : `<span>${escapeHtml(video.channel)}</span>`;
+          return `<a class="video-card" href="${video.url}" target="_blank" rel="noreferrer">
+            <div class="video-thumb">${thumb}</div>
+            <div class="video-body">
+              <span>${escapeHtml(video.channel)} / ${escapeHtml(video.intensity)}</span>
+              <strong>${escapeHtml(video.title)}</strong>
+              <p>${escapeHtml(video.note)}</p>
+              <div class="video-tags">${[...video.purposes, ...video.parts].slice(0,5).map(tag => `<em>${escapeHtml(tag)}</em>`).join("")}</div>
+              <div class="video-link-text">YouTubeで見る</div>
+            </div>
+          </a>`;
+        }).join("");
       }
       function renderPhotoSlider() {
         const photo = musclePhotos[state.activePhoto];
@@ -1134,6 +1701,9 @@
         renderPartChart();
         renderLevel();
         renderReport();
+        // YouTube動画スライダー復活時に戻す
+        // renderVideoFilters();
+        // renderVideoSlider();
         renderPhotoSlider();
       }
       $("logForm").addEventListener("submit", event => {
@@ -1159,6 +1729,9 @@
         state.selectedPart = "胸";
         state.activePhoto = 0;
         state.chartMode = "week";
+        // YouTube動画スライダー復活時に戻す
+        // state.videoPurpose = "すべて";
+        // state.videoPart = "すべて";
         toast("サンプルに戻しました");
         render();
       });
@@ -1176,6 +1749,21 @@
         state.activePhoto = (state.activePhoto + 1) % musclePhotos.length;
         renderPhotoSlider();
       });
+      // YouTube動画スライダーは、動画リスト充実後に復活予定。
+      // $("videoPurpose").addEventListener("change", event => {
+      //   state.videoPurpose = event.target.value;
+      //   renderVideoSlider();
+      // });
+      // $("videoPart").addEventListener("change", event => {
+      //   state.videoPart = event.target.value;
+      //   renderVideoSlider();
+      // });
+      // $("prevVideo").addEventListener("click", () => {
+      //   $("videoTrack").scrollBy({ left:-342, behavior:"smooth" });
+      // });
+      // $("nextVideo").addEventListener("click", () => {
+      //   $("videoTrack").scrollBy({ left:342, behavior:"smooth" });
+      // });
       render();
     })();
   </script>
