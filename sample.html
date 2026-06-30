@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#121416">
-  <title>YUDAI Muscle Quest</title>
+  <title>サンプル | YUDAI Muscle Quest</title>
   <style>
     :root {
       color-scheme: light;
@@ -747,12 +747,12 @@
           <div class="brand-mark">YM</div>
           <div>
             <strong>YUDAI Muscle Quest</strong>
-            <span>優大の筋トレ習慣化</span>
+            <span>優大の筋トレ習慣化・サンプル</span>
           </div>
         </div>
         <div class="top-actions">
-          <button class="icon-btn" type="button" id="resetBtn" title="入力をクリア">↺</button>
-          <a class="primary-btn" href="sample.html">サンプル</a>
+          <button class="icon-btn" type="button" id="resetBtn" title="サンプルに戻す">↺</button>
+          <a class="primary-btn" href="index.html">本番へ戻る</a>
           <a class="primary-btn" href="theory.html">超回復理論</a>
           <a class="primary-btn" href="photos.html">写真記録</a>
           <button class="primary-btn" type="button" id="quickAddBtn">今日の筋トレ</button>
@@ -775,7 +775,7 @@
         <section class="hero" id="home">
           <div class="hero-copy">
             <div>
-              <span class="kicker">WEEKLY MUSCLE QUEST</span>
+              <span class="kicker">SAMPLE MUSCLE QUEST</span>
               <h1>休ませながら、毎日続く体を作る。</h1>
               <p>重量よりも継続リズムを重視。部位ごとに1日休んで2日目に戻るのをベスト、2日休んで3日目までは許容として見る筋トレ習慣アプリ。</p>
             </div>
@@ -1233,36 +1233,32 @@
           note:"膝に配慮しながら大臀筋・中臀筋・腿裏を狙う美尻系メニュー。"
         }
       ];
-      const exerciseTemplates = [
-        "ベンチプレス",
-        "ラットプルダウン",
-        "スクワット",
-        "ショルダープレス",
-        "ダンベルカール",
-        "クランチ",
-        "プランク",
-        "レッグプレス",
-        "デッドリフト",
-        "腕立て伏せ"
+      const sampleLogs = [
+        { date:"2026-06-02", part:"胸", exercise:"ベンチプレス", weight:50, reps:8, sets:3 },
+        { date:"2026-06-03", part:"背中", exercise:"ラットプルダウン", weight:37.5, reps:10, sets:3 },
+        { date:"2026-06-06", part:"脚", exercise:"スクワット", weight:62.5, reps:6, sets:3 },
+        { date:"2026-06-10", part:"肩", exercise:"ショルダープレス", weight:22.5, reps:8, sets:3 },
+        { date:"2026-06-12", part:"胸", exercise:"ベンチプレス", weight:52.5, reps:8, sets:3 },
+        { date:"2026-06-14", part:"腕", exercise:"ダンベルカール", weight:10, reps:10, sets:3 },
+        { date:"2026-06-16", part:"背中", exercise:"ラットプルダウン", weight:40, reps:10, sets:3 },
+        { date:"2026-06-18", part:"脚", exercise:"スクワット", weight:67.5, reps:6, sets:3 },
+        { date:"2026-06-22", part:"胸", exercise:"ベンチプレス", weight:55, reps:8, sets:3 },
+        { date:"2026-06-22", part:"腕", exercise:"ダンベルカール", weight:12, reps:10, sets:3 },
+        { date:"2026-06-24", part:"背中", exercise:"ラットプルダウン", weight:42.5, reps:10, sets:3 },
+        { date:"2026-06-24", part:"脚", exercise:"スクワット", weight:70, reps:6, sets:3 },
+        { date:"2026-06-25", part:"胸", exercise:"ベンチプレス", weight:60, reps:8, sets:3 },
+        { date:"2026-06-25", part:"腹", exercise:"クランチ", weight:0, reps:25, sets:3 }
       ];
-      const state = { logs:[], selectedPart:"胸", activePhoto:0, chartMode:"week", videoPurpose:"すべて", videoPart:"すべて" };
-      const today = dateToISO(new Date());
+      const state = { logs:[...sampleLogs], selectedPart:"胸", activePhoto:0, chartMode:"week", videoPurpose:"すべて", videoPart:"すべて" };
+      const today = "2026-06-27";
       const $ = id => document.getElementById(id);
       const fmt = n => Number(n).toLocaleString("ja-JP");
       function weekDates() {
-        const base = new Date(`${today}T00:00:00`);
-        const mondayOffset = (base.getDay() + 6) % 7;
-        const monday = new Date(base);
-        monday.setDate(base.getDate() - mondayOffset);
-        return Array.from({ length:7 }, (_,index) => {
-          const date = new Date(monday);
-          date.setDate(monday.getDate() + index);
-          return dateToISO(date);
-        });
+        return ["2026-06-22","2026-06-23","2026-06-24","2026-06-25","2026-06-26","2026-06-27","2026-06-28"];
       }
       function labelDate(date) {
         const names = ["月","火","水","木","金","土","日"];
-        return names[(new Date(`${date}T00:00:00`).getDay() + 6) % 7] || "";
+        return names[weekDates().indexOf(date)] || "";
       }
       function dateToISO(date) {
         const copy = new Date(date);
@@ -1424,12 +1420,7 @@
         const breakdown = pointBreakdown();
         let title = "休息リズム、かなりいい流れ。";
         let text = "重さより、同じ部位を休ませて戻ってくることを優先しよう。1日休息して2日目に戻るのがベスト、疲労が強ければ2日休息も許容です。";
-        if (!state.logs.length) {
-          mood = "warning";
-          status = "初回待ち";
-          title = "まずは1種目だけ記録しよう。";
-          text = "本番ページはサンプルデータなしです。部位と種目を選んで、優大さん本人の記録だけを積み上げます。";
-        } else if (breakdown.staleParts.length) {
+        if (breakdown.staleParts.length) {
           mood = "danger";
           status = "空き注意";
           title = `${breakdown.staleParts.join("・")}が空き気味。`;
@@ -1492,7 +1483,7 @@
         }).join("") : `<article class="record"><div class="muscle-icon">${state.selectedPart.slice(0,1)}</div><div><strong>未記録</strong><small>この部位の記録はまだありません。</small></div><div class="gain flat">0</div></article>`;
       }
       function renderOptions() {
-        const exercises = [...new Set([...exerciseTemplates, ...state.logs.map(log => log.exercise)])];
+        const exercises = [...new Set(state.logs.map(log => log.exercise))];
         $("exerciseList").innerHTML = exercises.map(name => `<option value="${name}"></option>`).join("");
       }
       function renderBodyMap() {
@@ -1735,14 +1726,14 @@
         $("record").scrollIntoView({ behavior:"smooth", block:"start" });
       });
       $("resetBtn").addEventListener("click", () => {
-        state.logs = [];
+        state.logs = [...sampleLogs];
         state.selectedPart = "胸";
         state.activePhoto = 0;
         state.chartMode = "week";
         // YouTube動画スライダー復活時に戻す
         // state.videoPurpose = "すべて";
         // state.videoPart = "すべて";
-        toast("入力データをクリアしました");
+        toast("サンプルに戻しました");
         render();
       });
       $("chartMode").addEventListener("click", event => {
