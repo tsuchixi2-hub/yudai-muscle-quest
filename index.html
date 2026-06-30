@@ -85,6 +85,18 @@
       font-weight:900;
       text-decoration:none;
     }
+    .text-link {
+      min-height:40px;
+      display:inline-flex;
+      align-items:center;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:900;
+      text-decoration:underline;
+      text-underline-offset:3px;
+      white-space:nowrap;
+    }
+    .text-link:hover { color:var(--coal); }
     .trainer-banner {
       margin-top:18px;
       min-height:96px;
@@ -752,7 +764,7 @@
         </div>
         <div class="top-actions">
           <button class="icon-btn" type="button" id="resetBtn" title="入力をクリア">↺</button>
-          <a class="primary-btn" href="sample.html">サンプル</a>
+          <a class="text-link" href="sample.html">サンプル</a>
           <a class="primary-btn" href="theory.html">超回復理論</a>
           <a class="primary-btn" href="photos.html">写真記録</a>
           <button class="primary-btn" type="button" id="quickAddBtn">今日の筋トレ</button>
