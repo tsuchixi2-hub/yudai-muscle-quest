@@ -8,6 +8,7 @@
 - `sample.html`: サンプルデータ入りの確認ページ
 - `levels.html`: ポイント・レベル表
 - `photos.html`: 週ごとの筋肉写真記録、写真選択、スマホ撮影記録
+- `ranking.html`: 登録者全体ランキング
 - `theory.html`: 超回復と筋肥大理論
 
 ## Cloudflare Pages
@@ -21,9 +22,20 @@ Static HTML + Pages Functions.
 ## Data storage
 
 - Workout logs: Cloudflare D1 (`workout_logs`)
-- Photo records: Cloudflare D1 (`photo_records`)
+- Users and sessions: Cloudflare D1 (`users`, `sessions`)
+- Photo metadata: Cloudflare D1 (`photo_records`)
+- Photo objects: Cloudflare R2 (`yudai-muscle-quest-photos`)
 - API routes:
+  - `/api/auth/demo-login`
+  - `/api/auth/me`
+  - `/api/auth/logout`
   - `/api/workouts`
   - `/api/photos`
+  - `/api/photo`
+  - `/api/users`
+  - `/api/users/:id/summary`
+  - `/api/rankings`
 
-R2 is not enabled on the Cloudflare account yet, so compressed photo data is currently stored in D1 as a data URL. When R2 is enabled, move photo binaries to R2 and keep only metadata and object keys in D1.
+LINE login is planned for the next phase. The current multi-user implementation uses demo login and the same session model that LINE login can reuse later.
+
+R2 must be enabled on the Cloudflare account before production photo uploads can store image objects.

@@ -1,17 +1,6 @@
-const jsonHeaders = {
-  "content-type": "application/json; charset=utf-8",
-  "cache-control": "no-store"
-};
+import { isDateText, json, requireUser } from "./_auth.js";
 
 const validParts = new Set(["胸", "背中", "肩", "腕", "脚", "腹", "全身"]);
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), { status, headers: jsonHeaders });
-}
-
-function isDateText(value) {
-  return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
-}
 
 function normalizeRow(row) {
   return {
@@ -22,21 +11,29 @@ function normalizeRow(row) {
     weight: Number(row.weight),
     reps: Number(row.reps),
     sets: Number(row.sets || 3),
-    createdAt: row.created_at
+    createdAt: row.created_at,
+    userId: row.user_id || ""
   };
 }
 
-export async function onRequestGet({ env }) {
+export async function onRequestGet({ request, env }) {
+  const auth = await requireUser(request, env);
+  if (auth.response) return auth.response;
+
   const { results } = await env.DB.prepare(
-    `SELECT id, date, part, exercise, weight, reps, sets, created_at
+    `SELECT id, user_id, date, part, exercise, weight, reps, sets, created_at
      FROM workout_logs
+     WHERE user_id = ?
      ORDER BY date ASC, created_at ASC`
-  ).all();
+  ).bind(auth.user.id).all();
 
   return json({ logs: results.map(normalizeRow) });
 }
 
 export async function onRequestPost({ request, env }) {
+  const auth = await requireUser(request, env);
+  if (auth.response) return auth.response;
+
   let body;
   try {
     body = await request.json();
@@ -61,6 +58,7 @@ export async function onRequestPost({ request, env }) {
 
   const log = {
     id: `log-${Date.now()}-${crypto.randomUUID()}`,
+    userId: auth.user.id,
     date,
     part,
     exercise,
@@ -71,24 +69,27 @@ export async function onRequestPost({ request, env }) {
   };
 
   await env.DB.prepare(
-    `INSERT INTO workout_logs (id, date, part, exercise, weight, reps, sets, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-  ).bind(log.id, log.date, log.part, log.exercise, log.weight, log.reps, log.sets, log.createdAt).run();
+    `INSERT INTO workout_logs (id, user_id, date, part, exercise, weight, reps, sets, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(log.id, log.userId, log.date, log.part, log.exercise, log.weight, log.reps, log.sets, log.createdAt).run();
 
   return json({ log }, 201);
 }
 
 export async function onRequestDelete({ request, env }) {
+  const auth = await requireUser(request, env);
+  if (auth.response) return auth.response;
+
   const url = new URL(request.url);
   const id = url.searchParams.get("id");
   const all = url.searchParams.get("all") === "1";
 
   if (all) {
-    await env.DB.prepare("DELETE FROM workout_logs").run();
+    await env.DB.prepare("DELETE FROM workout_logs WHERE user_id = ?").bind(auth.user.id).run();
     return json({ ok: true });
   }
 
   if (!id) return json({ error: "missing_id" }, 400);
-  await env.DB.prepare("DELETE FROM workout_logs WHERE id = ?").bind(id).run();
+  await env.DB.prepare("DELETE FROM workout_logs WHERE id = ? AND user_id = ?").bind(id, auth.user.id).run();
   return json({ ok: true });
 }

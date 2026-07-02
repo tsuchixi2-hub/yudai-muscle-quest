@@ -31,6 +31,7 @@
     button,input,textarea { font:inherit; }
     button { cursor:pointer; }
     a { color:inherit; }
+    .hidden { display:none !important; }
     .app { width:min(1080px,100%); margin:0 auto; padding:0 18px 80px; }
     .topbar {
       position:sticky;
@@ -71,6 +72,70 @@
       font-size:12px;
       font-weight:900;
       white-space:nowrap;
+    }
+    .top-actions { display:flex; align-items:center; gap:8px; }
+    .user-chip {
+      min-height:40px;
+      padding:0 12px;
+      display:inline-flex;
+      align-items:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .icon-btn {
+      width:40px;
+      height:40px;
+      display:grid;
+      place-items:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      font-weight:900;
+    }
+    .primary-btn {
+      min-height:40px;
+      padding:0 14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:0;
+      border-radius:8px;
+      color:#fff;
+      background:var(--red);
+      font-size:12px;
+      font-weight:900;
+      text-decoration:none;
+    }
+    .auth-panel {
+      margin-top:18px;
+      padding:14px;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:14px;
+      align-items:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      box-shadow:var(--shadow);
+    }
+    .auth-panel h2 { margin:0; color:var(--coal); font-size:17px; }
+    .auth-panel p { margin:5px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
+    .auth-form { display:flex; gap:8px; align-items:center; }
+    .auth-form input {
+      width:180px;
+      min-height:40px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:0 10px;
+      background:#f9fafb;
+      font-size:13px;
+      font-weight:800;
     }
     .trainer-banner {
       margin-top:18px;
@@ -331,6 +396,11 @@
     @media (max-width:620px) {
       .app { padding-inline:12px; }
       .topbar { margin-inline:-12px; padding-inline:12px; }
+      .topbar-inner { align-items:flex-start; flex-direction:column; }
+      .top-actions { width:100%; overflow:auto; }
+      .auth-panel { grid-template-columns:1fr; }
+      .auth-form { flex-direction:column; align-items:stretch; }
+      .auth-form input { width:100%; }
       .brand span { display:none; }
       h1 { font-size:31px; }
       .trainer-banner { grid-template-columns:48px minmax(0,1fr); }
@@ -358,9 +428,25 @@
             <span>週ごとの筋肉写真記録</span>
           </div>
         </div>
-        <a class="back-link" href="index.html">ホームへ</a>
+        <div class="top-actions">
+          <span class="user-chip" id="userChip">未ログイン</span>
+          <button class="icon-btn hidden" type="button" id="logoutBtn" title="ログアウト">⎋</button>
+          <a class="back-link" href="ranking.html">ランキング</a>
+          <a class="back-link" href="index.html">ホームへ</a>
+        </div>
       </div>
     </header>
+
+    <section class="auth-panel" id="authPanel">
+      <div>
+        <h2>仮ログイン</h2>
+        <p>写真記録は本人だけが見られます。名前を入れて専用の写真タイムラインを開きます。</p>
+      </div>
+      <form class="auth-form" id="loginForm">
+        <input id="loginName" maxlength="32" placeholder="名前を入力" value="優大">
+        <button class="primary-btn" type="submit">はじめる</button>
+      </form>
+    </section>
 
     <section class="trainer-banner" id="trainerBanner" aria-live="polite">
       <div class="trainer-avatar">T</div>
@@ -453,7 +539,7 @@
 
   <script>
     (() => {
-      const state = { records:[], order:"desc", pendingImage:null };
+      const state = { records:[], order:"desc", pendingImage:null, currentUser:null };
       const $ = id => document.getElementById(id);
 
       function todayISO() {
@@ -478,11 +564,41 @@
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(data.error || "api_error");
+          const error = new Error(data.error || "api_error");
+          error.status = response.status;
+          throw error;
         }
         return data;
       }
+      function isLoggedIn() {
+        return Boolean(state.currentUser);
+      }
+      function renderAuth() {
+        $("authPanel").classList.toggle("hidden", isLoggedIn());
+        $("logoutBtn").classList.toggle("hidden", !isLoggedIn());
+        $("userChip").textContent = isLoggedIn() ? `${state.currentUser.publicName}でログイン中` : "未ログイン";
+        $("photoForm").querySelectorAll("input,textarea,button").forEach(input => { input.disabled = !isLoggedIn(); });
+      }
+      async function loadMe() {
+        try {
+          const data = await apiJson("/api/auth/me");
+          state.currentUser = data.user || null;
+          renderAuth();
+          if (state.currentUser) await loadRecords();
+          else {
+            state.records = [];
+            renderTimeline();
+          }
+        } catch {
+          state.currentUser = null;
+          state.records = [];
+          renderAuth();
+          renderTimeline();
+          toast("ログイン状態を確認できませんでした");
+        }
+      }
       async function loadRecords() {
+        if (!isLoggedIn()) return;
         try {
           const data = await apiJson("/api/photos");
           state.records = Array.isArray(data.records) ? data.records : [];
@@ -608,6 +724,7 @@
         $("trainerStatus").textContent = status;
       }
       function renderTimeline() {
+        renderAuth();
         const groups = groupedRecords();
         renderStats(groups);
         renderTrainerMessage(groups);
@@ -650,6 +767,10 @@
       $("cameraInput").addEventListener("change", handlePhotoPick);
       $("photoForm").addEventListener("submit", async event => {
         event.preventDefault();
+        if (!isLoggedIn()) {
+          toast("先に仮ログインしてください");
+          return;
+        }
         const selectedFile = $("photoInput").files && $("photoInput").files[0];
         const cameraFile = $("cameraInput").files && $("cameraInput").files[0];
         const file = cameraFile || selectedFile;
@@ -667,7 +788,8 @@
               date,
               memo:$("memoInput").value.trim(),
               fileName:file ? file.name : "photo",
-              image:state.pendingImage
+              image:state.pendingImage,
+              isPublic:false
             })
           });
           state.records.push(data.record);
@@ -702,8 +824,41 @@
           toast("削除できませんでした。通信を確認してください");
         }
       });
+      $("loginForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        const name = $("loginName").value.trim();
+        if (!name) {
+          toast("名前を入力してください");
+          return;
+        }
+        const btn = event.submitter || $("loginForm").querySelector("button");
+        btn.disabled = true;
+        try {
+          const data = await apiJson("/api/auth/demo-login", {
+            method:"POST",
+            body:JSON.stringify({ displayName:name })
+          });
+          state.currentUser = data.user;
+          toast(`${data.user.publicName}でログインしました`);
+          renderAuth();
+          await loadRecords();
+        } catch {
+          toast("ログインできませんでした");
+        } finally {
+          btn.disabled = false;
+        }
+      });
+      $("logoutBtn").addEventListener("click", async () => {
+        try {
+          await apiJson("/api/auth/logout", { method:"POST", body:"{}" });
+        } catch {}
+        state.currentUser = null;
+        state.records = [];
+        toast("ログアウトしました");
+        renderTimeline();
+      });
       renderTimeline();
-      loadRecords();
+      loadMe();
     })();
   </script>
 </body>

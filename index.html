@@ -97,6 +97,67 @@
       white-space:nowrap;
     }
     .text-link:hover { color:var(--coal); }
+    .hidden { display:none !important; }
+    .user-chip {
+      min-height:40px;
+      padding:0 12px;
+      display:inline-flex;
+      align-items:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .auth-panel,.user-switcher {
+      margin-top:18px;
+      padding:14px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      box-shadow:var(--shadow);
+    }
+    .auth-panel {
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:14px;
+      align-items:center;
+    }
+    .auth-panel h2,.user-switcher h2 { margin:0; color:var(--coal); font-size:17px; }
+    .auth-panel p,.user-switcher p { margin:5px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
+    .auth-form { display:flex; gap:8px; align-items:center; }
+    .auth-form input {
+      width:180px;
+      min-height:40px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:0 10px;
+      background:#f9fafb;
+      font-size:13px;
+      font-weight:800;
+    }
+    .user-switcher { display:grid; gap:11px; }
+    .user-tabs {
+      display:flex;
+      gap:8px;
+      overflow:auto;
+      padding-bottom:2px;
+    }
+    .user-tabs button {
+      min-height:38px;
+      padding:0 12px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .user-tabs button.active { border-color:var(--red); color:#fff; background:var(--red); }
+    .user-tabs button em { margin-left:5px; font-style:normal; opacity:.78; }
     .trainer-banner {
       margin-top:18px;
       min-height:96px;
@@ -729,6 +790,9 @@
       .topbar { margin-inline:-12px; padding-inline:12px; }
       h1 { font-size:31px; }
       .hero-copy { padding:18px; }
+      .auth-panel { grid-template-columns:1fr; }
+      .auth-form { flex-direction:column; align-items:stretch; }
+      .auth-form input { width:100%; }
       .hero-metrics,.week-grid,.side { grid-template-columns:1fr; }
       .trainer-banner { grid-template-columns:48px minmax(0,1fr); }
       .trainer-avatar { width:48px; height:48px; font-size:18px; }
@@ -764,13 +828,35 @@
         </div>
         <div class="top-actions">
           <button class="icon-btn" type="button" id="resetBtn" title="入力をクリア">↺</button>
+          <span class="user-chip" id="userChip">未ログイン</span>
+          <button class="icon-btn hidden" type="button" id="logoutBtn" title="ログアウト">⎋</button>
           <a class="text-link" href="sample.html">サンプル</a>
+          <a class="primary-btn" href="ranking.html">ランキング</a>
           <a class="primary-btn" href="theory.html">超回復理論</a>
           <a class="primary-btn" href="photos.html">写真記録</a>
           <button class="primary-btn" type="button" id="quickAddBtn">今日の筋トレ</button>
         </div>
       </div>
     </header>
+
+    <section class="auth-panel" id="authPanel">
+      <div>
+        <h2>仮ログイン</h2>
+        <p>LINEログイン接続前の実用テスト用です。名前ごとにデータを分けて保存します。</p>
+      </div>
+      <form class="auth-form" id="loginForm">
+        <input id="loginName" maxlength="32" placeholder="名前を入力" value="優大">
+        <button class="primary-btn" type="submit">はじめる</button>
+      </form>
+    </section>
+
+    <section class="user-switcher hidden" id="userSwitcher">
+      <div>
+        <h2>ユーザー比較</h2>
+        <p id="switcherText">自分のタブでは記録できます。他の人は公開サマリーとして閲覧します。</p>
+      </div>
+      <div class="user-tabs" id="userTabs"></div>
+    </section>
 
     <section class="trainer-banner" id="trainerBanner" aria-live="polite">
       <div class="trainer-avatar">T</div>
@@ -1257,7 +1343,18 @@
         "デッドリフト",
         "腕立て伏せ"
       ];
-      const state = { logs:[], selectedPart:"胸", activePhoto:0, chartMode:"week", videoPurpose:"すべて", videoPart:"すべて" };
+      const state = {
+        logs:[],
+        users:[],
+        currentUser:null,
+        selectedUser:null,
+        selectedUserId:null,
+        selectedPart:"胸",
+        activePhoto:0,
+        chartMode:"week",
+        videoPurpose:"すべて",
+        videoPart:"すべて"
+      };
       const today = dateToISO(new Date());
       const $ = id => document.getElementById(id);
       const fmt = n => Number(n).toLocaleString("ja-JP");
@@ -1271,20 +1368,61 @@
         });
         const data = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error(data.error || "api_error");
+          const error = new Error(data.error || "api_error");
+          error.status = response.status;
+          throw error;
         }
         return data;
       }
-      async function loadLogs() {
+      function isLoggedIn() {
+        return Boolean(state.currentUser);
+      }
+      function isOwnTab() {
+        return isLoggedIn() && state.selectedUserId === state.currentUser.id;
+      }
+      async function loadMe() {
         try {
-          const data = await apiJson("/api/workouts");
-          state.logs = Array.isArray(data.logs) ? data.logs : [];
+          const data = await apiJson("/api/auth/me");
+          state.currentUser = data.user || null;
+          state.selectedUserId = state.currentUser ? state.currentUser.id : null;
+          if (state.currentUser) {
+            await loadUsers();
+            await loadSelectedUser();
+          } else {
+            state.logs = [];
+            state.users = [];
+            state.selectedUser = null;
+          }
           render();
         } catch {
+          state.currentUser = null;
           state.logs = [];
           render();
-          toast("記録DBに接続できませんでした");
+          toast("ログイン状態を確認できませんでした");
         }
+      }
+      async function loadUsers() {
+        const data = await apiJson("/api/users");
+        state.users = Array.isArray(data.users) ? data.users : [];
+        if (!state.users.some(user => user.id === state.selectedUserId)) {
+          state.selectedUserId = state.currentUser ? state.currentUser.id : null;
+        }
+      }
+      async function loadSelectedUser() {
+        if (!state.selectedUserId) {
+          state.logs = [];
+          state.selectedUser = null;
+          return;
+        }
+        if (isOwnTab()) {
+          const data = await apiJson("/api/workouts");
+          state.logs = Array.isArray(data.logs) ? data.logs : [];
+          state.selectedUser = state.currentUser;
+          return;
+        }
+        const data = await apiJson(`/api/users/${encodeURIComponent(state.selectedUserId)}/summary`);
+        state.logs = Array.isArray(data.logs) ? data.logs : [];
+        state.selectedUser = data.user || state.users.find(user => user.id === state.selectedUserId) || null;
       }
       function weekDates() {
         const base = new Date(`${today}T00:00:00`);
@@ -1461,11 +1599,21 @@
         const breakdown = pointBreakdown();
         let title = "休息リズム、かなりいい流れ。";
         let text = "重さより、同じ部位を休ませて戻ってくることを優先しよう。1日休息して2日目に戻るのがベスト、疲労が強ければ2日休息も許容です。";
-        if (!state.logs.length) {
+        if (!isLoggedIn()) {
+          mood = "warning";
+          status = "ログイン待ち";
+          title = "名前を入れて、専用の記録スペースを作ろう。";
+          text = "複数人で使えるようになりました。仮ログイン後、自分のデータだけを保存できます。";
+        } else if (!isOwnTab()) {
+          mood = "";
+          status = "閲覧中";
+          title = `${state.selectedUser?.publicName || "他のユーザー"}さんのリズムを見ています。`;
+          text = "このタブは比較用です。記録を追加するときは自分のタブに戻ってください。";
+        } else if (!state.logs.length) {
           mood = "warning";
           status = "初回待ち";
           title = "まずは1種目だけ記録しよう。";
-          text = "本番ページはサンプルデータなしです。部位と種目を選んで、優大さん本人の記録だけを積み上げます。";
+          text = "本番ページはサンプルデータなしです。部位と種目を選んで、自分の記録だけを積み上げます。";
         } else if (breakdown.staleParts.length) {
           mood = "danger";
           status = "空き注意";
@@ -1738,6 +1886,7 @@
         }));
       }
       function render() {
+        renderAuth();
         renderWeek();
         renderTrainerMessage();
         renderTabs();
@@ -1753,8 +1902,29 @@
         // renderVideoSlider();
         renderPhotoSlider();
       }
+      function renderAuth() {
+        $("authPanel").classList.toggle("hidden", isLoggedIn());
+        $("userSwitcher").classList.toggle("hidden", !isLoggedIn());
+        $("logoutBtn").classList.toggle("hidden", !isLoggedIn());
+        $("userChip").textContent = isLoggedIn() ? `${state.currentUser.publicName}でログイン中` : "未ログイン";
+        $("switcherText").textContent = isOwnTab()
+          ? "自分のタブです。筋トレ記録を追加・削除できます。"
+          : "比較閲覧中です。記録を追加するときは自分のタブに戻ってください。";
+        $("userTabs").innerHTML = state.users.map(user => {
+          const active = user.id === state.selectedUserId ? "active" : "";
+          const label = user.id === state.currentUser?.id ? `${escapeHtml(user.publicName)}<em>自分</em>` : escapeHtml(user.publicName);
+          return `<button type="button" class="${active}" data-user-id="${user.id}">${label}</button>`;
+        }).join("");
+        const editable = isOwnTab();
+        $("logForm").querySelectorAll("input,select,button").forEach(input => { input.disabled = !editable; });
+        $("resetBtn").disabled = !editable;
+      }
       $("logForm").addEventListener("submit", async event => {
         event.preventDefault();
+        if (!isOwnTab()) {
+          toast(isLoggedIn() ? "自分のタブで記録してください" : "先に仮ログインしてください");
+          return;
+        }
         const part = $("partInput").value;
         const exercise = $("exerciseInput").value.trim();
         const weight = Number($("weightInput").value);
@@ -1781,9 +1951,21 @@
         }
       });
       $("quickAddBtn").addEventListener("click", () => {
+        if (!isLoggedIn()) {
+          $("authPanel").scrollIntoView({ behavior:"smooth", block:"start" });
+          return;
+        }
+        if (!isOwnTab()) {
+          state.selectedUserId = state.currentUser.id;
+          loadSelectedUser().then(render);
+        }
         $("record").scrollIntoView({ behavior:"smooth", block:"start" });
       });
       $("resetBtn").addEventListener("click", async () => {
+        if (!isOwnTab()) {
+          toast("自分のタブでだけクリアできます");
+          return;
+        }
         try {
           await apiJson("/api/workouts?all=1", { method:"DELETE" });
           state.logs = [];
@@ -1813,6 +1995,55 @@
         state.activePhoto = (state.activePhoto + 1) % musclePhotos.length;
         renderPhotoSlider();
       });
+      $("loginForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        const name = $("loginName").value.trim();
+        if (!name) {
+          toast("名前を入力してください");
+          return;
+        }
+        const btn = event.submitter || $("loginForm").querySelector("button");
+        btn.disabled = true;
+        try {
+          const data = await apiJson("/api/auth/demo-login", {
+            method:"POST",
+            body:JSON.stringify({ displayName:name })
+          });
+          state.currentUser = data.user;
+          state.selectedUserId = data.user.id;
+          await loadUsers();
+          await loadSelectedUser();
+          toast(`${data.user.publicName}でログインしました`);
+          render();
+        } catch {
+          toast("ログインできませんでした");
+        } finally {
+          btn.disabled = false;
+        }
+      });
+      $("logoutBtn").addEventListener("click", async () => {
+        try {
+          await apiJson("/api/auth/logout", { method:"POST", body:"{}" });
+        } catch {}
+        state.currentUser = null;
+        state.selectedUser = null;
+        state.selectedUserId = null;
+        state.users = [];
+        state.logs = [];
+        toast("ログアウトしました");
+        render();
+      });
+      $("userTabs").addEventListener("click", async event => {
+        const btn = event.target.closest("[data-user-id]");
+        if (!btn || btn.dataset.userId === state.selectedUserId) return;
+        state.selectedUserId = btn.dataset.userId;
+        try {
+          await loadSelectedUser();
+          render();
+        } catch {
+          toast("ユーザー情報を読み込めませんでした");
+        }
+      });
       // YouTube動画スライダーは、動画リスト充実後に復活予定。
       // $("videoPurpose").addEventListener("change", event => {
       //   state.videoPurpose = event.target.value;
@@ -1829,7 +2060,7 @@
       //   $("videoTrack").scrollBy({ left:342, behavior:"smooth" });
       // });
       render();
-      loadLogs();
+      loadMe();
     })();
   </script>
 </body>

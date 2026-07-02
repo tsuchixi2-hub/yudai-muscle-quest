@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#121416">
+  <title>ランキング | YUDAI Muscle Quest</title>
+  <style>
+    :root {
+      color-scheme:light;
+      --ink:#151719;
+      --muted:#6f757c;
+      --paper:#f5f6f7;
+      --panel:#ffffff;
+      --line:#dfe3e6;
+      --coal:#202428;
+      --red:#d63838;
+      --green:#16885b;
+      --blue:#2278b8;
+      --shadow:0 10px 24px rgba(21,23,25,.08);
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      color:var(--ink);
+      background:linear-gradient(180deg,#eceff1 0,#f7f7f5 300px,var(--paper) 100%);
+      font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic","Segoe UI",sans-serif;
+    }
+    button,input { font:inherit; }
+    button { cursor:pointer; }
+    a { color:inherit; }
+    .hidden { display:none !important; }
+    .app { width:min(1040px,100%); margin:0 auto; padding:0 18px 80px; }
+    .topbar {
+      position:sticky;
+      z-index:20;
+      top:0;
+      margin:0 -18px;
+      padding:max(12px,env(safe-area-inset-top)) 18px 11px;
+      border-bottom:1px solid rgba(223,227,230,.86);
+      background:rgba(245,246,247,.92);
+      backdrop-filter:blur(18px);
+    }
+    .topbar-inner { max-width:1004px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    .brand { display:flex; align-items:center; gap:10px; min-width:0; }
+    .brand-mark {
+      width:40px;
+      height:40px;
+      display:grid;
+      place-items:center;
+      border-radius:8px;
+      color:#fff;
+      background:linear-gradient(145deg,#111,#383d42);
+      font-weight:900;
+      flex:0 0 auto;
+    }
+    .brand strong { display:block; font-size:15px; line-height:1.1; }
+    .brand span { display:block; margin-top:4px; color:var(--muted); font-size:10px; font-weight:800; }
+    .top-actions { display:flex; align-items:center; gap:8px; }
+    .back-link,.user-chip {
+      min-height:40px;
+      padding:0 13px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      text-decoration:none;
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .icon-btn {
+      width:40px;
+      height:40px;
+      display:grid;
+      place-items:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      font-weight:900;
+    }
+    .primary-btn {
+      min-height:40px;
+      padding:0 14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:0;
+      border-radius:8px;
+      color:#fff;
+      background:var(--red);
+      font-size:12px;
+      font-weight:900;
+      text-decoration:none;
+    }
+    .auth-panel,.hero,.ranking {
+      margin-top:18px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      box-shadow:var(--shadow);
+    }
+    .auth-panel {
+      padding:14px;
+      display:grid;
+      grid-template-columns:minmax(0,1fr) auto;
+      gap:14px;
+      align-items:center;
+    }
+    .auth-panel h2 { margin:0; color:var(--coal); font-size:17px; }
+    .auth-panel p { margin:5px 0 0; color:var(--muted); font-size:12px; line-height:1.55; }
+    .auth-form { display:flex; gap:8px; align-items:center; }
+    .auth-form input {
+      width:180px;
+      min-height:40px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:0 10px;
+      background:#f9fafb;
+      font-size:13px;
+      font-weight:800;
+    }
+    .hero { padding:22px; }
+    .kicker { color:var(--red); font-size:11px; font-weight:900; }
+    h1 { margin:8px 0 0; color:var(--coal); font-size:38px; line-height:1.05; letter-spacing:0; }
+    .hero p { max-width:760px; margin:12px 0 0; color:var(--muted); font-size:14px; line-height:1.75; }
+    .ranking { overflow:hidden; }
+    .ranking-head,.ranking-row {
+      display:grid;
+      grid-template-columns:58px minmax(150px,1fr) 82px 96px 96px 110px 92px;
+      gap:10px;
+      align-items:center;
+      padding:13px 14px;
+      border-bottom:1px solid var(--line);
+    }
+    .ranking-head {
+      color:var(--muted);
+      background:#f8f9fa;
+      font-size:11px;
+      font-weight:900;
+    }
+    .ranking-row.current { background:#fff7f7; }
+    .ranking-row:last-child { border-bottom:0; }
+    .rank {
+      width:38px;
+      height:38px;
+      display:grid;
+      place-items:center;
+      border-radius:8px;
+      color:#fff;
+      background:var(--coal);
+      font-size:15px;
+      font-weight:900;
+    }
+    .rank.top { background:var(--red); }
+    .name strong { display:block; color:var(--coal); font-size:15px; }
+    .name span { display:block; margin-top:4px; color:var(--muted); font-size:11px; font-weight:800; }
+    .metric strong { display:block; color:var(--coal); font-size:15px; }
+    .metric span { display:block; margin-top:4px; color:var(--muted); font-size:10px; font-weight:900; }
+    .empty {
+      padding:34px 14px;
+      color:var(--muted);
+      text-align:center;
+      font-size:13px;
+      font-weight:900;
+      line-height:1.7;
+    }
+    .toast {
+      position:fixed;
+      z-index:40;
+      right:18px;
+      bottom:24px;
+      left:18px;
+      max-width:420px;
+      margin:auto;
+      padding:12px 14px;
+      border-radius:8px;
+      color:#fff;
+      background:rgba(21,23,25,.94);
+      text-align:center;
+      font-size:12px;
+      font-weight:900;
+      opacity:0;
+      transform:translateY(10px);
+      pointer-events:none;
+      transition:.18s ease;
+    }
+    .toast.show { opacity:1; transform:none; }
+    @media (max-width:820px) {
+      .ranking { overflow:auto; }
+      .ranking-head,.ranking-row { min-width:780px; }
+    }
+    @media (max-width:620px) {
+      .app { padding-inline:12px; }
+      .topbar { margin-inline:-12px; padding-inline:12px; }
+      .topbar-inner { align-items:flex-start; flex-direction:column; }
+      .top-actions { width:100%; overflow:auto; }
+      .brand span { display:none; }
+      .auth-panel { grid-template-columns:1fr; }
+      .auth-form { flex-direction:column; align-items:stretch; }
+      .auth-form input { width:100%; }
+      h1 { font-size:31px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-mark">YM</div>
+          <div>
+            <strong>YUDAI Muscle Quest</strong>
+            <span>登録者全体ランキング</span>
+          </div>
+        </div>
+        <div class="top-actions">
+          <span class="user-chip" id="userChip">未ログイン</span>
+          <button class="icon-btn hidden" type="button" id="logoutBtn" title="ログアウト">⎋</button>
+          <a class="back-link" href="photos.html">写真記録</a>
+          <a class="back-link" href="index.html">ホームへ</a>
+        </div>
+      </div>
+    </header>
+
+    <section class="auth-panel" id="authPanel">
+      <div>
+        <h2>仮ログイン</h2>
+        <p>ランキングを見るには名前を入れてログインします。LINEログイン接続前のテスト用です。</p>
+      </div>
+      <form class="auth-form" id="loginForm">
+        <input id="loginName" maxlength="32" placeholder="名前を入力" value="優大">
+        <button class="primary-btn" type="submit">はじめる</button>
+      </form>
+    </section>
+
+    <section class="hero">
+      <span class="kicker">GLOBAL MUSCLE RANKING</span>
+      <h1>続けた人が、上に行く。</h1>
+      <p>ランキングは重量や回数だけではなく、今週の実行日、同じ部位に戻る休息リズム、連続記録を中心に見ます。</p>
+    </section>
+
+    <section class="ranking" id="ranking"></section>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    (() => {
+      const state = { currentUser:null, ranking:[] };
+      const $ = id => document.getElementById(id);
+
+      function toast(text) {
+        const el = $("toast");
+        el.textContent = text;
+        el.classList.add("show");
+        clearTimeout(toast.timer);
+        toast.timer = setTimeout(() => el.classList.remove("show"), 1800);
+      }
+      function escapeHtml(text) {
+        return String(text || "").replace(/[&<>"']/g, char => ({
+          "&":"&amp;",
+          "<":"&lt;",
+          ">":"&gt;",
+          "\"":"&quot;",
+          "'":"&#39;"
+        })[char]);
+      }
+      async function apiJson(path, options = {}) {
+        const response = await fetch(path, {
+          ...options,
+          headers:{
+            "content-type":"application/json",
+            ...(options.headers || {})
+          }
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const error = new Error(data.error || "api_error");
+          error.status = response.status;
+          throw error;
+        }
+        return data;
+      }
+      function renderAuth() {
+        const loggedIn = Boolean(state.currentUser);
+        $("authPanel").classList.toggle("hidden", loggedIn);
+        $("logoutBtn").classList.toggle("hidden", !loggedIn);
+        $("userChip").textContent = loggedIn ? `${state.currentUser.publicName}でログイン中` : "未ログイン";
+      }
+      function renderRanking() {
+        renderAuth();
+        if (!state.currentUser) {
+          $("ranking").innerHTML = `<div class="empty">仮ログインすると、登録者全体ランキングを表示します。</div>`;
+          return;
+        }
+        if (!state.ranking.length) {
+          $("ranking").innerHTML = `<div class="empty">まだランキング対象の記録がありません。</div>`;
+          return;
+        }
+        $("ranking").innerHTML = `
+          <div class="ranking-head">
+            <span>順位</span><span>ユーザー</span><span>レベル</span><span>ポイント</span><span>今週</span><span>休息間隔</span><span>連続</span>
+          </div>
+          ${state.ranking.map(item => `
+            <article class="ranking-row ${item.isCurrent ? "current" : ""}">
+              <div class="rank ${item.rank <= 3 ? "top" : ""}">${item.rank}</div>
+              <div class="name"><strong>${escapeHtml(item.publicName)}${item.isCurrent ? "（自分）" : ""}</strong><span>${item.totalLogs}件の記録</span></div>
+              <div class="metric"><strong>Lv.${item.level}</strong><span>${escapeHtml(item.levelName)}</span></div>
+              <div class="metric"><strong>${item.points}pt</strong><span>継続重視</span></div>
+              <div class="metric"><strong>${item.weekDone}/7日</strong><span>今週実行</span></div>
+              <div class="metric"><strong>${item.bestIntervalCount + item.okIntervalCount}件</strong><span>ベスト/許容</span></div>
+              <div class="metric"><strong>${item.streak}日</strong><span>最長連続</span></div>
+            </article>
+          `).join("")}
+        `;
+      }
+      async function loadMe() {
+        try {
+          const data = await apiJson("/api/auth/me");
+          state.currentUser = data.user || null;
+          renderAuth();
+          if (state.currentUser) await loadRanking();
+          else renderRanking();
+        } catch {
+          state.currentUser = null;
+          renderRanking();
+          toast("ログイン状態を確認できませんでした");
+        }
+      }
+      async function loadRanking() {
+        try {
+          const data = await apiJson("/api/rankings");
+          state.ranking = Array.isArray(data.ranking) ? data.ranking : [];
+          renderRanking();
+        } catch {
+          state.ranking = [];
+          renderRanking();
+          toast("ランキングを読み込めませんでした");
+        }
+      }
+      $("loginForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        const name = $("loginName").value.trim();
+        if (!name) {
+          toast("名前を入力してください");
+          return;
+        }
+        const btn = event.submitter || $("loginForm").querySelector("button");
+        btn.disabled = true;
+        try {
+          const data = await apiJson("/api/auth/demo-login", {
+            method:"POST",
+            body:JSON.stringify({ displayName:name })
+          });
+          state.currentUser = data.user;
+          toast(`${data.user.publicName}でログインしました`);
+          await loadRanking();
+        } catch {
+          toast("ログインできませんでした");
+        } finally {
+          btn.disabled = false;
+        }
+      });
+      $("logoutBtn").addEventListener("click", async () => {
+        try {
+          await apiJson("/api/auth/logout", { method:"POST", body:"{}" });
+        } catch {}
+        state.currentUser = null;
+        state.ranking = [];
+        toast("ログアウトしました");
+        renderRanking();
+      });
+      renderRanking();
+      loadMe();
+    })();
+  </script>
+</body>
+</html>
