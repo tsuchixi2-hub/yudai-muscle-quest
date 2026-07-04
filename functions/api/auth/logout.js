@@ -5,5 +5,5 @@ export async function onRequestPost({ request, env }) {
   if (user?.sessionId) {
     await env.DB.prepare("DELETE FROM sessions WHERE id = ?").bind(user.sessionId).run();
   }
-  return json({ ok:true }, 200, { "set-cookie":clearSessionCookie() });
+  return json({ ok:true }, 200, { "set-cookie":clearSessionCookie(request) });
 }

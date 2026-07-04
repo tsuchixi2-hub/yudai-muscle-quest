@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#121416">
-  <title>サンプル | YUDAI Muscle Quest</title>
+  <title>サンプル | Muscle Quest</title>
   <style>
     :root {
       color-scheme: light;
@@ -52,14 +52,14 @@
       display:grid;
       place-items:center;
       flex:0 0 auto;
+      border:1px solid var(--line);
       border-radius:8px;
-      color:#fff;
-      background:linear-gradient(145deg,#111,#383d42);
-      font-weight:900;
+      background:#fff;
+      overflow:hidden;
     }
+    .brand-mark img { width:100%; height:100%; display:block; object-fit:cover; object-position:center 44%; filter:grayscale(1); }
     .brand-mark.sample {
-      color:#f8f9fa;
-      background:linear-gradient(145deg,#747b82,#b9bec4);
+      background:#dfe3e6;
     }
     .sample-eyebrow {
       display:block;
@@ -73,6 +73,64 @@
     .brand strong { display:block; font-size:15px; line-height:1.1; }
     .brand span { display:block; margin-top:4px; color:var(--muted); font-size:10px; font-weight:800; }
     .top-actions { display:flex; align-items:center; gap:8px; }
+    .brand { text-decoration:none; }
+    .icon-btn.menu-toggle { display:grid; }
+    body.menu-open { overflow:hidden; }
+    body.menu-open .topbar { z-index:60; }
+    body.menu-open::before {
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:40;
+      background:rgba(18,20,22,.18);
+      backdrop-filter:blur(1px);
+    }
+    .mobile-menu {
+      width:min(320px,calc(100vw - 24px));
+      max-height:calc(100vh - 92px);
+      margin:0;
+      padding:10px;
+      display:grid;
+      gap:8px;
+      position:fixed;
+      top:calc(70px + env(safe-area-inset-top,0px));
+      right:max(12px,env(safe-area-inset-right,0px));
+      z-index:50;
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      box-shadow:var(--shadow);
+      opacity:0;
+      pointer-events:none;
+      transform:translateX(calc(100% + 24px));
+      transition:transform .22s ease, opacity .22s ease;
+      will-change:transform;
+    }
+    .mobile-menu.open {
+      opacity:1;
+      pointer-events:auto;
+      transform:translateX(0);
+    }
+    .mobile-menu a,.mobile-menu button {
+      min-height:42px;
+      padding:0 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      font-size:12px;
+      font-weight:900;
+      text-decoration:none;
+    }
+    .mobile-menu .mobile-primary {
+      border:0;
+      color:#fff;
+      background:var(--red);
+    }
     .icon-btn {
       width:40px;
       height:40px;
@@ -97,6 +155,126 @@
       font-size:12px;
       font-weight:900;
       text-decoration:none;
+    }
+    .user-switcher {
+      margin-top:12px;
+      padding:13px;
+      display:grid;
+      gap:11px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      box-shadow:var(--shadow);
+    }
+    .user-switcher h2 { margin:0; color:var(--coal); font-size:17px; }
+    .user-switcher p { margin:4px 0 0; color:var(--muted); font-size:11px; line-height:1.45; }
+    .user-tabs {
+      display:flex;
+      gap:8px;
+      overflow:auto;
+      padding-bottom:2px;
+    }
+    .user-tabs button {
+      min-height:38px;
+      padding:0 12px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .user-tabs button.active { border-color:var(--red); color:#fff; background:var(--red); }
+    .user-tabs button em { margin-left:5px; font-style:normal; opacity:.78; }
+    .ranking-summary {
+      margin-top:12px;
+      padding:9px 10px;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      box-shadow:var(--shadow);
+    }
+    .ranking-summary-head {
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .ranking-summary-head h2 { margin:0; color:var(--coal); font-size:16px; }
+    .ranking-summary-head span { color:var(--muted); font-size:10px; font-weight:900; }
+    .ranking-updated { text-align:right; white-space:nowrap; }
+    .ranking-summary-list {
+      margin-top:9px;
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:6px;
+    }
+    .ranking-mini-card {
+      min-height:48px;
+      padding:8px 10px;
+      display:grid;
+      grid-template-columns:auto minmax(0,1fr);
+      gap:3px 8px;
+      align-items:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      color:var(--coal);
+    }
+    .ranking-mini-card.current { border-color:#f0b1b1; }
+    .ranking-mini-card.rank-gold .ranking-mini-rank { color:#c89416; }
+    .ranking-mini-card.rank-silver .ranking-mini-rank { color:#8f98a3; }
+    .ranking-mini-card.rank-bronze .ranking-mini-rank { color:#a5622c; }
+    .ranking-mini-card.rank-small { min-height:40px; padding-block:6px; }
+    .ranking-mini-rank {
+      display:flex;
+      align-items:center;
+      gap:4px;
+      font-size:12px;
+      font-weight:900;
+      grid-row:1 / span 2;
+    }
+    .ranking-mini-rank svg { width:14px; height:14px; fill:currentColor; flex:0 0 auto; }
+    .ranking-mini-card strong {
+      min-width:0;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+      color:var(--coal);
+      font-size:13px;
+      line-height:1.3;
+    }
+    .ranking-mini-card span {
+      color:var(--muted);
+      font-size:11px;
+      font-weight:900;
+      line-height:1.45;
+      text-align:left;
+      white-space:nowrap;
+    }
+    .rank-change {
+      display:inline-flex;
+      margin-left:6px;
+      font-size:10px;
+      font-style:normal;
+      font-weight:900;
+      white-space:nowrap;
+    }
+    .rank-change.up { color:var(--blue); }
+    .rank-change.down { color:var(--red); }
+    .rank-change.same { color:var(--muted); }
+    .rank-change-from { margin-left:4px; color:var(--muted); }
+    .ranking-mini-card.rank-small strong { font-size:12px; }
+    .ranking-mini-card.rank-small span { font-size:10px; }
+    .ranking-summary-link {
+      margin-top:10px;
+      display:inline-flex;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:900;
+      text-decoration:underline;
+      text-underline-offset:3px;
     }
     .trainer-banner {
       margin-top:18px;
@@ -728,6 +906,10 @@
     @media (max-width:620px) {
       .app { padding-inline:12px; }
       .topbar { margin-inline:-12px; padding-inline:12px; }
+      .topbar-inner { flex-wrap:wrap; gap:8px; }
+      .top-actions { margin-left:auto; }
+      .icon-btn.menu-toggle { display:grid; }
+      .mobile-menu { width:min(320px,calc(100vw - 24px)); }
       h1 { font-size:31px; }
       .hero-copy { padding:18px; }
       .hero-metrics,.week-grid,.side { grid-template-columns:1fr; }
@@ -756,23 +938,42 @@
   <div class="app">
     <header class="topbar">
       <div class="topbar-inner">
-        <div class="brand">
-          <div class="brand-mark sample">YM</div>
+        <a class="brand" href="index.html" aria-label="ホーム">
+          <div class="brand-mark sample" aria-hidden="true">
+            <img src="assets/muscle-quest-icon-white.png" alt="">
+          </div>
           <div>
             <span class="sample-eyebrow">サンプル</span>
-            <strong>YUDAI Muscle Quest</strong>
-            <span>優大の筋トレ習慣化・サンプル</span>
+            <strong>Muscle Quest</strong>
+            <span>みんなで筋トレ習慣化・サンプル</span>
           </div>
-        </div>
+        </a>
         <div class="top-actions">
-          <button class="icon-btn" type="button" id="resetBtn" title="サンプルに戻す">↺</button>
-          <a class="primary-btn" href="index.html">本番へ戻る</a>
-          <a class="primary-btn" href="theory.html">超回復理論</a>
-          <a class="primary-btn" href="photos.html">写真記録</a>
-          <button class="primary-btn" type="button" id="quickAddBtn">今日の筋トレ</button>
+          <button class="icon-btn menu-toggle" type="button" id="menuBtn" aria-controls="mobileMenu" aria-expanded="false" aria-label="メニュー">☰</button>
         </div>
       </div>
+      <nav class="mobile-menu" id="mobileMenu" aria-label="スマホメニュー" data-menu-quick="button"></nav>
     </header>
+
+    <section class="user-switcher" id="userSwitcher">
+      <div>
+        <h2>ユーザー比較</h2>
+        <p id="switcherText">サンプルでは7人の記録を切り替えて、レベル・ポイント・休息リズムを比較できます。</p>
+      </div>
+      <div class="user-tabs" id="userTabs"></div>
+    </section>
+
+    <section class="ranking-summary" id="rankingSummary">
+      <div class="ranking-summary-head">
+        <div>
+          <span>RANKING SUMMARY</span>
+          <h2>現在の上位4名</h2>
+        </div>
+        <span class="ranking-updated" id="rankingSummaryUpdated"></span>
+      </div>
+      <div class="ranking-summary-list" id="rankingSummaryList"></div>
+      <a class="ranking-summary-link" href="ranking.html">詳しいランキングをみる</a>
+    </section>
 
     <section class="trainer-banner" id="trainerBanner" aria-live="polite">
       <div class="trainer-avatar">T</div>
@@ -801,7 +1002,7 @@
           </div>
           <div class="muscle-visual">
             <div class="photo-note">
-              <span>今週の筋肉</span>
+              <span>今週のテーマ</span>
               <strong>背中の厚みは、続けた日の数で作られる。</strong>
             </div>
           </div>
@@ -903,9 +1104,9 @@
       <aside class="side">
         <section class="panel quote" id="muscle">
           <div class="panel-body">
-            <h2>今週の筋肉</h2>
+            <h2>今週の名言</h2>
             <blockquote>「筋肉は裏切らない。記録はもっと裏切らない。」</blockquote>
-            <p>今週は背中。胸や脚だけに偏らず、空きすぎた部位を戻すと休息リズムが整います。</p>
+            <p>テーマは背中。胸や脚だけに偏らず、空きすぎた部位を戻すと休息リズムが整います。</p>
           </div>
         </section>
 
@@ -1021,6 +1222,7 @@
   </nav>
   <div class="toast" id="toast"></div>
 
+  <script src="assets/shared-menu.js"></script>
   <script>
     (() => {
       const parts = ["胸","背中","肩","腕","脚","腹","全身"];
@@ -1247,7 +1449,17 @@
           note:"膝に配慮しながら大臀筋・中臀筋・腿裏を狙う美尻系メニュー。"
         }
       ];
-      const sampleLogs = [
+      const sampleUsers = [
+        { id:"ouki", publicName:"王騎", previousRank:2, dailyDelta:96 },
+        { id:"tou", publicName:"騰", previousRank:1, dailyDelta:24 },
+        { id:"moubu", publicName:"蒙武", previousRank:5, dailyDelta:152 },
+        { id:"hyoukou", publicName:"麃公", previousRank:3, dailyDelta:48 },
+        { id:"yotanwa", publicName:"楊端和", previousRank:6, dailyDelta:118 },
+        { id:"kanki", publicName:"桓騎", previousRank:4, dailyDelta:-12 },
+        { id:"riboku", publicName:"李牧", previousRank:7, dailyDelta:82 }
+      ];
+      const sampleLogsByUser = {
+        ouki:[
         { date:"2026-06-02", part:"胸", exercise:"ベンチプレス", weight:50, reps:8, sets:3 },
         { date:"2026-06-03", part:"背中", exercise:"ラットプルダウン", weight:37.5, reps:10, sets:3 },
         { date:"2026-06-06", part:"脚", exercise:"スクワット", weight:62.5, reps:6, sets:3 },
@@ -1262,11 +1474,105 @@
         { date:"2026-06-24", part:"脚", exercise:"スクワット", weight:70, reps:6, sets:3 },
         { date:"2026-06-25", part:"胸", exercise:"ベンチプレス", weight:60, reps:8, sets:3 },
         { date:"2026-06-25", part:"腹", exercise:"クランチ", weight:0, reps:25, sets:3 }
-      ];
-      const state = { logs:[...sampleLogs], selectedPart:"胸", activePhoto:0, chartMode:"week", videoPurpose:"すべて", videoPart:"すべて" };
+        ],
+        tou:[
+          { date:"2026-06-01", part:"背中", exercise:"ラットプルダウン", weight:42.5, reps:10, sets:3 },
+          { date:"2026-06-03", part:"脚", exercise:"レッグプレス", weight:110, reps:10, sets:3 },
+          { date:"2026-06-05", part:"胸", exercise:"ベンチプレス", weight:55, reps:8, sets:3 },
+          { date:"2026-06-09", part:"背中", exercise:"シーテッドロー", weight:45, reps:10, sets:3 },
+          { date:"2026-06-11", part:"脚", exercise:"スクワット", weight:72.5, reps:7, sets:3 },
+          { date:"2026-06-15", part:"肩", exercise:"ショルダープレス", weight:25, reps:9, sets:3 },
+          { date:"2026-06-17", part:"胸", exercise:"インクラインプレス", weight:42.5, reps:10, sets:3 },
+          { date:"2026-06-21", part:"背中", exercise:"ラットプルダウン", weight:45, reps:10, sets:3 },
+          { date:"2026-06-22", part:"脚", exercise:"スクワット", weight:75, reps:7, sets:3 },
+          { date:"2026-06-24", part:"胸", exercise:"ベンチプレス", weight:60, reps:8, sets:3 },
+          { date:"2026-06-26", part:"背中", exercise:"シーテッドロー", weight:50, reps:10, sets:3 },
+          { date:"2026-06-27", part:"腕", exercise:"ダンベルカール", weight:14, reps:10, sets:3 }
+        ],
+        moubu:[
+          { date:"2026-06-02", part:"胸", exercise:"ベンチプレス", weight:72.5, reps:6, sets:4 },
+          { date:"2026-06-04", part:"脚", exercise:"スクワット", weight:100, reps:5, sets:4 },
+          { date:"2026-06-08", part:"背中", exercise:"デッドリフト", weight:120, reps:5, sets:3 },
+          { date:"2026-06-12", part:"胸", exercise:"ベンチプレス", weight:75, reps:6, sets:4 },
+          { date:"2026-06-16", part:"脚", exercise:"スクワット", weight:105, reps:5, sets:4 },
+          { date:"2026-06-20", part:"背中", exercise:"デッドリフト", weight:125, reps:5, sets:3 },
+          { date:"2026-06-22", part:"胸", exercise:"ベンチプレス", weight:77.5, reps:6, sets:4 },
+          { date:"2026-06-23", part:"胸", exercise:"ダンベルプレス", weight:32.5, reps:8, sets:3 },
+          { date:"2026-06-25", part:"脚", exercise:"スクワット", weight:110, reps:5, sets:4 },
+          { date:"2026-06-27", part:"背中", exercise:"デッドリフト", weight:130, reps:5, sets:3 }
+        ],
+        hyoukou:[
+          { date:"2026-06-03", part:"脚", exercise:"ランジ", weight:20, reps:12, sets:3 },
+          { date:"2026-06-05", part:"胸", exercise:"腕立て伏せ", weight:0, reps:30, sets:3 },
+          { date:"2026-06-07", part:"背中", exercise:"懸垂", weight:0, reps:8, sets:3 },
+          { date:"2026-06-11", part:"脚", exercise:"スクワット", weight:70, reps:8, sets:3 },
+          { date:"2026-06-15", part:"肩", exercise:"ショルダープレス", weight:22.5, reps:9, sets:3 },
+          { date:"2026-06-18", part:"胸", exercise:"ベンチプレス", weight:57.5, reps:8, sets:3 },
+          { date:"2026-06-22", part:"背中", exercise:"懸垂", weight:0, reps:9, sets:3 },
+          { date:"2026-06-24", part:"脚", exercise:"ランジ", weight:22.5, reps:12, sets:3 },
+          { date:"2026-06-26", part:"胸", exercise:"ベンチプレス", weight:60, reps:8, sets:3 }
+        ],
+        yotanwa:[
+          { date:"2026-06-01", part:"全身", exercise:"ケトルベルスイング", weight:20, reps:20, sets:3 },
+          { date:"2026-06-04", part:"脚", exercise:"ブルガリアンスクワット", weight:20, reps:10, sets:3 },
+          { date:"2026-06-08", part:"背中", exercise:"ラットプルダウン", weight:40, reps:10, sets:3 },
+          { date:"2026-06-10", part:"腹", exercise:"プランク", weight:0, reps:60, sets:3 },
+          { date:"2026-06-14", part:"肩", exercise:"サイドレイズ", weight:8, reps:14, sets:3 },
+          { date:"2026-06-18", part:"脚", exercise:"レッグプレス", weight:120, reps:10, sets:3 },
+          { date:"2026-06-22", part:"胸", exercise:"ダンベルプレス", weight:26, reps:10, sets:3 },
+          { date:"2026-06-24", part:"背中", exercise:"ラットプルダウン", weight:42.5, reps:10, sets:3 },
+          { date:"2026-06-26", part:"脚", exercise:"ブルガリアンスクワット", weight:22.5, reps:10, sets:3 },
+          { date:"2026-06-27", part:"腹", exercise:"クランチ", weight:0, reps:30, sets:3 }
+        ],
+        kanki:[
+          { date:"2026-06-02", part:"胸", exercise:"ベンチプレス", weight:65, reps:7, sets:3 },
+          { date:"2026-06-03", part:"胸", exercise:"インクラインプレス", weight:45, reps:8, sets:3 },
+          { date:"2026-06-09", part:"腕", exercise:"ダンベルカール", weight:16, reps:8, sets:3 },
+          { date:"2026-06-15", part:"胸", exercise:"ベンチプレス", weight:67.5, reps:7, sets:3 },
+          { date:"2026-06-16", part:"胸", exercise:"ダンベルフライ", weight:18, reps:10, sets:3 },
+          { date:"2026-06-22", part:"腕", exercise:"ハンマーカール", weight:16, reps:9, sets:3 },
+          { date:"2026-06-23", part:"腕", exercise:"ダンベルカール", weight:16, reps:9, sets:3 },
+          { date:"2026-06-27", part:"胸", exercise:"ベンチプレス", weight:70, reps:7, sets:3 }
+        ],
+        riboku:[
+          { date:"2026-06-01", part:"腹", exercise:"プランク", weight:0, reps:60, sets:3 },
+          { date:"2026-06-04", part:"背中", exercise:"シーテッドロー", weight:42.5, reps:10, sets:3 },
+          { date:"2026-06-08", part:"脚", exercise:"スクワット", weight:65, reps:8, sets:3 },
+          { date:"2026-06-12", part:"胸", exercise:"ベンチプレス", weight:52.5, reps:9, sets:3 },
+          { date:"2026-06-16", part:"肩", exercise:"ショルダープレス", weight:22.5, reps:9, sets:3 },
+          { date:"2026-06-20", part:"背中", exercise:"ラットプルダウン", weight:42.5, reps:11, sets:3 },
+          { date:"2026-06-22", part:"脚", exercise:"レッグプレス", weight:115, reps:10, sets:3 },
+          { date:"2026-06-24", part:"胸", exercise:"ベンチプレス", weight:55, reps:9, sets:3 },
+          { date:"2026-06-26", part:"背中", exercise:"シーテッドロー", weight:45, reps:10, sets:3 }
+        ]
+      };
+      const sampleLogs = sampleLogsByUser.ouki;
+      const state = {
+        users:sampleUsers,
+        logsByUser:sampleLogsByUser,
+        selectedUserId:"ouki",
+        logs:sampleLogs,
+        selectedPart:"胸",
+        activePhoto:0,
+        chartMode:"week",
+        videoPurpose:"すべて",
+        videoPart:"すべて",
+        rankingUpdatedAt:"2026-06-27T21:00:00+09:00"
+      };
       const today = "2026-06-27";
       const $ = id => document.getElementById(id);
       const fmt = n => Number(n).toLocaleString("ja-JP");
+      function selectedUser() {
+        return state.users.find(user => user.id === state.selectedUserId) || state.users[0];
+      }
+      function setSelectedUser(userId) {
+        if (!state.logsByUser[userId]) return;
+        state.selectedUserId = userId;
+        state.logs = state.logsByUser[userId];
+        const latestPart = [...state.logs].sort((a,b) => b.date.localeCompare(a.date))[0]?.part || "胸";
+        state.selectedPart = parts.includes(latestPart) ? latestPart : "胸";
+        render();
+      }
       function weekDates() {
         return ["2026-06-22","2026-06-23","2026-06-24","2026-06-25","2026-06-26","2026-06-27","2026-06-28"];
       }
@@ -1351,11 +1657,13 @@
           return { part, logs, volume, improved, best };
         });
       }
-      function pointBreakdown() {
+      function calculateBreakdownFor(logs) {
+        const logsForDate = date => logs.filter(log => log.date === date);
+        const datesForPart = part => [...new Set(logs.filter(log => log.part === part).map(log => log.date))].sort();
         const bodyParts = parts.filter(part => part !== "全身");
-        const weekDone = workoutDays();
+        const weekDone = weekDates().filter(date => logsForDate(date).length);
         const partIntervals = bodyParts.flatMap(part => {
-          const dates = trainingDatesForPart(part).filter(date => date <= today);
+          const dates = datesForPart(part).filter(date => date <= today);
           return dates.slice(1).map((date,index) => ({
             part,
             interval:dateDiffDays(date, dates[index])
@@ -1366,36 +1674,69 @@
         const optimalIntervals = [...bestIntervals, ...okIntervals];
         const tooShortIntervals = partIntervals.filter(item => item.interval === 1);
         const staleParts = bodyParts.filter(part => {
-          const dates = trainingDatesForPart(part).filter(date => date <= today);
+          const dates = datesForPart(part).filter(date => date <= today);
           if (!dates.length) return false;
           return dateDiffDays(today, dates.at(-1)) >= 4;
         });
-        const weekPartsByDay = weekDates().map(date => dayLogs(date).map(log => log.part).filter(part => part !== "全身"));
+        const weekPartsByDay = weekDates().map(date => logsForDate(date).map(log => log.part).filter(part => part !== "全身"));
         const everyDayDone = weekPartsByDay.every(day => day.length > 0);
         const noSamePartNextDay = weekPartsByDay.slice(1).every((day,index) => {
           const prev = weekPartsByDay[index];
           return day.every(part => !prev.includes(part));
         });
         const sevenDayRhythm = everyDayDone && noSamePartNextDay;
-        const base = state.logs.length * 6;
+        const base = logs.length * 6;
         const activeDayBonus = weekDone.length * 8;
         const intervalBonus = bestIntervals.length * 18 + okIntervals.length * 10;
-        const varietyBonus = new Set(state.logs.map(log => log.part).filter(part => part !== "全身")).size * 10;
+        const varietyBonus = new Set(logs.map(log => log.part).filter(part => part !== "全身")).size * 10;
         const sevenDayBonus = sevenDayRhythm ? 120 : 0;
         const shortPenalty = tooShortIntervals.length * 8;
         const stalePenalty = staleParts.length * 15;
         const total = Math.max(0, base + activeDayBonus + intervalBonus + varietyBonus + sevenDayBonus - shortPenalty - stalePenalty);
         return { total, base, activeDayBonus, intervalBonus, varietyBonus, sevenDayBonus, shortPenalty, stalePenalty, staleParts, bestIntervals, okIntervals, optimalIntervals, sevenDayRhythm };
       }
+      function pointBreakdown() {
+        return calculateBreakdownFor(state.logs);
+      }
       function points() {
         return pointBreakdown().total;
       }
+      function levelForPoints(pointValue) {
+        let result = levels[0];
+        levels.forEach(level => { if (pointValue >= level.points) result = level; });
+        return result;
+      }
       function currentLevel() {
         const p = points();
-        let result = levels[0];
-        levels.forEach(level => { if (p >= level.points) result = level; });
+        let result = levelForPoints(p);
         const next = levels.find(level => level.points > p) || null;
         return { current:result, next, points:p };
+      }
+      function buildSampleRanking() {
+        return state.users
+          .map(user => {
+            const userLogs = state.logsByUser[user.id] || [];
+            const pointValue = calculateBreakdownFor(userLogs).total;
+            const level = levelForPoints(pointValue);
+            return {
+              ...user,
+              points:pointValue,
+              level:level.level,
+              previousPoints:Math.max(0, pointValue - Number(user.dailyDelta || 0)),
+              isCurrent:user.id === state.selectedUserId
+            };
+          })
+          .sort((a,b) => b.points - a.points)
+          .map((user,index) => ({ ...user, rank:index + 1, rankChange:Number(user.previousRank || index + 1) - (index + 1), pointChange:Number(user.dailyDelta || 0) }));
+      }
+      function rankChangeHtml(item) {
+        const change = Number(item?.rankChange || 0);
+        const pointChange = Number(item?.pointChange || 0);
+        const pointLabel = `${pointChange >= 0 ? "+" : ""}${fmt(pointChange)}pt`;
+        const fromRank = item?.previousRank ? `<span class="rank-change-from">from ${item.previousRank}位</span>` : `<span class="rank-change-from">new</span>`;
+        if (change > 0) return `<em class="rank-change up">up↑ ${pointLabel} ${fromRank}</em>`;
+        if (change < 0) return `<em class="rank-change down">down↓ ${pointLabel} ${fromRank}</em>`;
+        return `<em class="rank-change same">same ${pointLabel} ${fromRank}</em>`;
       }
       function toast(text) {
         const el = $("toast");
@@ -1403,6 +1744,28 @@
         el.classList.add("show");
         clearTimeout(toast.timer);
         toast.timer = setTimeout(() => el.classList.remove("show"), 1800);
+      }
+      function renderUserSwitcher() {
+        const activeUser = selectedUser();
+        $("switcherText").textContent = `${activeUser.publicName}のサンプル記録を表示中。タブで7人のレベル・ポイント・休息リズムを比較できます。`;
+        $("userTabs").innerHTML = state.users.map(user => {
+          const active = user.id === state.selectedUserId ? "active" : "";
+          const label = user.id === "ouki" ? `${escapeHtml(user.publicName)}<em>自分</em>` : escapeHtml(user.publicName);
+          return `<button type="button" class="${active}" data-user-id="${user.id}">${label}</button>`;
+        }).join("");
+      }
+      function renderRankingSummary() {
+        const ranking = buildSampleRanking();
+        $("rankingSummaryUpdated").textContent = "更新 2026/06/27 21:00";
+        const crown = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7l5 4 4-7 4 7 5-4-2 11H5L3 7Zm3 13h12v2H6v-2Z"></path></svg>`;
+        const rankClass = item => item.rank === 1 ? "rank-gold" : item.rank === 2 ? "rank-silver" : item.rank === 3 ? "rank-bronze" : "rank-small";
+        $("rankingSummaryList").innerHTML = ranking.slice(0, 4).map(item => `
+          <article class="ranking-mini-card ${rankClass(item)} ${item.isCurrent ? "current" : ""}">
+            <div class="ranking-mini-rank">${item.rank === 1 ? crown : ""}<b>${item.rank}</b></div>
+            <strong>${escapeHtml(item.publicName)}</strong>
+            <span>Lv.${item.level} / ${fmt(item.points)}pt ${rankChangeHtml(item)}</span>
+          </article>
+        `).join("");
       }
       function renderWeek() {
         const done = workoutDays();
@@ -1640,7 +2003,7 @@
         const count = workoutDays().length;
         const breakdown = pointBreakdown();
         $("report").textContent = [
-          "【YUDAI Muscle Quest】",
+          "【Muscle Quest】",
           `今週の実行日：${count}/7日`,
           `ポイント：${breakdown.total}pt`,
           `ベスト間隔：${breakdown.bestIntervals.length}件`,
@@ -1706,6 +2069,8 @@
         }));
       }
       function render() {
+        renderUserSwitcher();
+        renderRankingSummary();
         renderWeek();
         renderTrainerMessage();
         renderTabs();
@@ -1721,6 +2086,12 @@
         // renderVideoSlider();
         renderPhotoSlider();
       }
+      $("userTabs").addEventListener("click", event => {
+        const btn = event.target.closest("[data-user-id]");
+        if (!btn || btn.dataset.userId === state.selectedUserId) return;
+        setSelectedUser(btn.dataset.userId);
+        toast(`${selectedUser().publicName}の記録を表示しました`);
+      });
       $("logForm").addEventListener("submit", event => {
         event.preventDefault();
         const part = $("partInput").value;
@@ -1737,18 +2108,56 @@
         render();
       });
       $("quickAddBtn").addEventListener("click", () => {
+        closeMobileMenu();
         $("record").scrollIntoView({ behavior:"smooth", block:"start" });
       });
-      $("resetBtn").addEventListener("click", () => {
-        state.logs = [...sampleLogs];
-        state.selectedPart = "胸";
-        state.activePhoto = 0;
-        state.chartMode = "week";
-        // YouTube動画スライダー復活時に戻す
-        // state.videoPurpose = "すべて";
-        // state.videoPart = "すべて";
-        toast("サンプルに戻しました");
-        render();
+      function closeMobileMenu() {
+        $("mobileMenu").classList.remove("open");
+        document.body.classList.remove("menu-open");
+        $("menuBtn").setAttribute("aria-expanded", "false");
+      }
+      function openMobileMenu() {
+        $("mobileMenu").classList.add("open");
+        document.body.classList.add("menu-open");
+        $("menuBtn").setAttribute("aria-expanded", "true");
+      }
+      $("menuBtn").addEventListener("click", event => {
+        event.stopPropagation();
+        const open = !$("mobileMenu").classList.contains("open");
+        if (open) openMobileMenu();
+        else closeMobileMenu();
+      });
+      document.addEventListener("click", event => {
+        if (!$("mobileMenu").classList.contains("open")) return;
+        if (event.target.closest("#mobileMenu") || event.target.closest("#menuBtn")) return;
+        closeMobileMenu();
+      });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape") closeMobileMenu();
+      });
+      $("mobileMenu").addEventListener("click", event => {
+        if (event.target.closest("a,button")) closeMobileMenu();
+      });
+      let menuTouchStartX = 0;
+      let menuTouchStartY = 0;
+      let menuTouchLastX = 0;
+      let menuTouchLastY = 0;
+      $("mobileMenu").addEventListener("touchstart", event => {
+        const touch = event.touches[0];
+        menuTouchStartX = touch.clientX;
+        menuTouchStartY = touch.clientY;
+        menuTouchLastX = touch.clientX;
+        menuTouchLastY = touch.clientY;
+      }, { passive:true });
+      $("mobileMenu").addEventListener("touchmove", event => {
+        const touch = event.touches[0];
+        menuTouchLastX = touch.clientX;
+        menuTouchLastY = touch.clientY;
+      }, { passive:true });
+      $("mobileMenu").addEventListener("touchend", () => {
+        const deltaX = menuTouchLastX - menuTouchStartX;
+        const deltaY = Math.abs(menuTouchLastY - menuTouchStartY);
+        if (deltaX > 60 && deltaY < 80) closeMobileMenu();
       });
       $("chartMode").addEventListener("click", event => {
         const btn = event.target.closest("[data-chart-mode]");

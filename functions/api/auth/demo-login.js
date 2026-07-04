@@ -8,9 +8,10 @@ export async function onRequestPost({ request, env }) {
     return json({ error:"invalid_json" }, 400);
   }
 
-  const name = safeName(body.displayName) || "ユーザー";
+  const name = safeName(body.displayName) || "LINEユーザー";
   const now = new Date().toISOString();
-  const demoKey = demoKeyFor(name);
+  const demoKey = safeName(body.demoKey) ? `demo:${safeName(body.demoKey)}` : demoKeyFor(name);
+  const publicName = safeName(body.publicName) || name;
   let user = await env.DB.prepare(
     `SELECT id, display_name, public_name, picture_url
      FROM users
@@ -22,7 +23,7 @@ export async function onRequestPost({ request, env }) {
     await env.DB.prepare(
       `INSERT INTO users (id, line_user_id, demo_key, display_name, public_name, picture_url, created_at, updated_at)
        VALUES (?, NULL, ?, ?, ?, '', ?, ?)`
-    ).bind(id, demoKey, name, name, now, now).run();
+    ).bind(id, demoKey, name, publicName, now, now).run();
     user = await env.DB.prepare(
       `SELECT id, display_name, public_name, picture_url
        FROM users
@@ -31,12 +32,12 @@ export async function onRequestPost({ request, env }) {
   } else {
     await env.DB.prepare(
       `UPDATE users
-       SET display_name = ?, public_name = ?, updated_at = ?
+       SET display_name = ?, updated_at = ?
        WHERE id = ?`
-    ).bind(name, name, now, user.id).run();
-    user = { ...user, display_name:name, public_name:name };
+    ).bind(name, now, user.id).run();
+    user = { ...user, display_name:name };
   }
 
   const session = await createSession(env, user.id);
-  return json({ user:normalizeUser(user) }, 200, { "set-cookie":sessionCookie(session.id, session.expiresAt) });
+  return json({ user:normalizeUser(user), needsNickname:Boolean(body.needsNickname) }, 200, { "set-cookie":sessionCookie(session.id, session.expiresAt, request) });
 }

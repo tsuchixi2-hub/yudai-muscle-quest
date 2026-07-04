@@ -6,7 +6,3 @@ pages_build_output_dir = "."
 binding = "DB"
 database_name = "yudai-muscle-quest-db"
 database_id = "c25fbb42-5c7c-42f7-8dd4-cc1e81b21433"
-
-[[r2_buckets]]
-binding = "PHOTOS"
-bucket_name = "yudai-muscle-quest-photos"

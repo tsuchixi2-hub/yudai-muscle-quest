@@ -14,7 +14,7 @@ export function isDateText(value) {
   return typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
-function parseCookies(request) {
+export function parseCookies(request) {
   const header = request.headers.get("cookie") || "";
   return Object.fromEntries(header.split(";").map(item => {
     const index = item.indexOf("=");
@@ -23,13 +23,27 @@ function parseCookies(request) {
   }).filter(([key]) => key));
 }
 
-export function sessionCookie(sessionId, expiresAt) {
-  const maxAge = Math.max(0, Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000));
-  return `${sessionCookieName}=${encodeURIComponent(sessionId)}; Max-Age=${maxAge}; Path=/; HttpOnly; Secure; SameSite=Lax`;
+function cookieAttributes(request) {
+  const url = request ? new URL(request.url) : null;
+  const localHttp = url?.protocol === "http:" && ["localhost", "127.0.0.1", "::1"].includes(url.hostname);
+  return `Path=/; HttpOnly; ${localHttp ? "" : "Secure; "}SameSite=Lax`;
 }
 
-export function clearSessionCookie() {
-  return `${sessionCookieName}=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=Lax`;
+export function sessionCookie(sessionId, expiresAt, request) {
+  const maxAge = Math.max(0, Math.floor((new Date(expiresAt).getTime() - Date.now()) / 1000));
+  return `${sessionCookieName}=${encodeURIComponent(sessionId)}; Max-Age=${maxAge}; ${cookieAttributes(request)}`;
+}
+
+export function clearSessionCookie(request) {
+  return `${sessionCookieName}=; Max-Age=0; ${cookieAttributes(request)}`;
+}
+
+export function temporaryCookie(name, value, maxAge = 600, request) {
+  return `${name}=${encodeURIComponent(value)}; Max-Age=${maxAge}; ${cookieAttributes(request)}`;
+}
+
+export function clearCookie(name, request) {
+  return `${name}=; Max-Age=0; ${cookieAttributes(request)}`;
 }
 
 export async function getSessionUser(request, env) {

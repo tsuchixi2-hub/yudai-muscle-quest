@@ -1,6 +1,6 @@
-# YUDAI Muscle Quest
+# Muscle Quest
 
-優大の筋トレ習慣化アプリのHTMLモックです。
+みんなで使う筋トレ習慣化アプリのHTMLモックです。
 
 ## Pages
 
@@ -27,8 +27,11 @@ Static HTML + Pages Functions.
 - Photo objects: Cloudflare R2 (`yudai-muscle-quest-photos`)
 - API routes:
   - `/api/auth/demo-login`
+  - `/api/auth/line/start`
+  - `/api/auth/line/callback`
   - `/api/auth/me`
   - `/api/auth/logout`
+  - `/api/auth/nickname`
   - `/api/workouts`
   - `/api/photos`
   - `/api/photo`
@@ -36,6 +39,12 @@ Static HTML + Pages Functions.
   - `/api/users/:id/summary`
   - `/api/rankings`
 
-LINE login is planned for the next phase. The current multi-user implementation uses demo login and the same session model that LINE login can reuse later.
+LINE login UI is available. In local development, the green LINE login button falls back to demo LINE login when LINE credentials are not configured. For production LINE login, set:
+
+- `LINE_CHANNEL_ID`
+- `LINE_CHANNEL_SECRET`
+- `LINE_CALLBACK_URL`
+
+After login, the user sets a public nickname used in rankings.
 
 R2 must be enabled on the Cloudflare account before production photo uploads can store image objects.

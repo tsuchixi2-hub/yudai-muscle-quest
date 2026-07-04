@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#121416">
-  <title>筋肉写真記録 | YUDAI Muscle Quest</title>
+  <title>筋肉写真記録 | Muscle Quest</title>
   <style>
     :root {
       color-scheme:light;
@@ -21,7 +21,15 @@
       --shadow:0 10px 24px rgba(21,23,25,.08);
     }
     * { box-sizing:border-box; }
+    html {
+      width:100%;
+      max-width:100%;
+      overflow-x:hidden;
+    }
     body {
+      width:100%;
+      max-width:100%;
+      overflow-x:hidden;
       margin:0;
       color:var(--ink);
       background:linear-gradient(180deg,#eceff1 0,#f7f7f5 320px,var(--paper) 100%);
@@ -51,11 +59,12 @@
       display:grid;
       place-items:center;
       flex:0 0 auto;
+      border:1px solid var(--line);
       border-radius:8px;
-      color:#fff;
-      background:linear-gradient(145deg,#111,#383d42);
-      font-weight:900;
+      background:#fff;
+      overflow:hidden;
     }
+    .brand-mark img { width:100%; height:100%; display:block; object-fit:cover; object-position:center 44%; }
     .brand strong { display:block; font-size:15px; line-height:1.1; }
     .brand span { display:block; margin-top:4px; color:var(--muted); font-size:10px; font-weight:800; }
     .back-link {
@@ -74,11 +83,83 @@
       white-space:nowrap;
     }
     .top-actions { display:flex; align-items:center; gap:8px; }
+    .brand { text-decoration:none; }
+    .icon-btn.menu-toggle { display:grid; }
+    body.menu-open { overflow:hidden; }
+    body.menu-open .topbar { z-index:60; }
+    body.menu-open::before {
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:40;
+      background:rgba(18,20,22,.18);
+      backdrop-filter:blur(1px);
+    }
+    .mobile-menu {
+      width:min(320px,calc(100vw - 24px));
+      max-height:calc(100vh - 92px);
+      margin:0;
+      padding:10px;
+      display:grid;
+      gap:8px;
+      position:fixed;
+      top:calc(70px + env(safe-area-inset-top,0px));
+      right:max(12px,env(safe-area-inset-right,0px));
+      z-index:50;
+      overflow:auto;
+      border:1px solid var(--line);
+      border-radius:8px;
+      background:#fff;
+      box-shadow:var(--shadow);
+      opacity:0;
+      pointer-events:none;
+      transform:translateX(calc(100% + 24px));
+      transition:transform .22s ease, opacity .22s ease;
+      will-change:transform;
+    }
+    .mobile-menu.open {
+      opacity:1;
+      pointer-events:auto;
+      transform:translateX(0);
+    }
+    .mobile-menu a,.mobile-menu button {
+      min-height:42px;
+      padding:0 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:1px solid var(--line);
+      border-radius:8px;
+      color:var(--coal);
+      background:#fff;
+      font-size:12px;
+      font-weight:900;
+      text-decoration:none;
+    }
+    .mobile-menu .logout-link {
+      min-height:auto;
+      padding:6px 0;
+      justify-content:center;
+      border:0;
+      color:var(--muted);
+      background:transparent;
+      text-align:center;
+      text-decoration:underline;
+      text-underline-offset:3px;
+    }
+    .mobile-menu .mobile-primary {
+      border:0;
+      color:#fff;
+      background:var(--red);
+    }
     .user-chip {
       min-height:40px;
       padding:0 12px;
       display:inline-flex;
-      align-items:center;
+      flex-direction:column;
+      align-items:flex-start;
+      justify-content:center;
+      gap:3px;
       border:1px solid var(--line);
       border-radius:8px;
       color:var(--coal);
@@ -87,6 +168,11 @@
       font-weight:900;
       white-space:nowrap;
     }
+    .user-chip-main { display:flex; align-items:center; gap:10px; line-height:1.15; }
+    .user-chip-meta { color:var(--muted); font-size:10px; font-weight:900; line-height:1.15; }
+    .user-chip-meta.rank-gold { color:#c89416; }
+    .user-chip-meta.rank-silver { color:#8f98a3; }
+    .user-chip-meta.rank-bronze { color:#a5622c; }
     .icon-btn {
       width:40px;
       height:40px;
@@ -98,6 +184,32 @@
       background:#fff;
       font-weight:900;
     }
+    .logout-link {
+      min-height:40px;
+      padding:0;
+      border:0;
+      color:var(--muted);
+      background:transparent;
+      font-size:12px;
+      font-weight:900;
+      text-decoration:underline;
+      text-underline-offset:3px;
+      white-space:nowrap;
+    }
+    .logout-link:hover { color:var(--coal); }
+    .header-edit-link {
+      min-height:auto;
+      padding:0;
+      border:0;
+      color:var(--muted);
+      background:transparent;
+      font-size:11px;
+      font-weight:900;
+      text-decoration:underline;
+      text-underline-offset:3px;
+      white-space:nowrap;
+    }
+    .header-edit-link:hover { color:var(--coal); }
     .primary-btn {
       min-height:40px;
       padding:0 14px;
@@ -135,6 +247,51 @@
       padding:0 10px;
       background:#f9fafb;
       font-size:13px;
+      font-weight:800;
+    }
+    .nickname-review {
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-start;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+    }
+    .nickname-review strong {
+      color:var(--coal);
+      font-size:14px;
+    }
+    .text-link {
+      padding:0;
+      border:0;
+      color:var(--red);
+      background:transparent;
+      font-size:12px;
+      font-weight:900;
+      text-decoration:underline;
+      text-underline-offset:3px;
+    }
+    .line-login-btn {
+      min-height:42px;
+      padding:0 18px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border:0;
+      border-radius:8px;
+      color:#fff;
+      background:#06c755;
+      font-size:13px;
+      font-weight:900;
+      white-space:nowrap;
+      box-shadow:0 8px 18px rgba(6,199,85,.22);
+    }
+    .auth-note {
+      display:block;
+      margin-top:8px;
+      color:var(--muted);
+      font-size:11px;
       font-weight:800;
     }
     .trainer-banner {
@@ -396,12 +553,14 @@
     @media (max-width:620px) {
       .app { padding-inline:12px; }
       .topbar { margin-inline:-12px; padding-inline:12px; }
-      .topbar-inner { align-items:flex-start; flex-direction:column; }
-      .top-actions { width:100%; overflow:auto; }
+      .topbar-inner { flex-wrap:wrap; gap:8px; }
+      .top-actions { margin-left:auto; }
+      .icon-btn.menu-toggle { display:grid; }
+      .mobile-menu { width:min(320px,calc(100vw - 24px)); }
+      .top-actions .back-link { display:none; }
       .auth-panel { grid-template-columns:1fr; }
       .auth-form { flex-direction:column; align-items:stretch; }
       .auth-form input { width:100%; }
-      .brand span { display:none; }
       h1 { font-size:31px; }
       .trainer-banner { grid-template-columns:48px minmax(0,1fr); }
       .trainer-avatar { width:48px; height:48px; font-size:18px; }
@@ -421,30 +580,41 @@
   <div class="app">
     <header class="topbar">
       <div class="topbar-inner">
-        <div class="brand">
-          <div class="brand-mark">YM</div>
-          <div>
-            <strong>YUDAI Muscle Quest</strong>
-            <span>週ごとの筋肉写真記録</span>
+        <a class="brand" href="index.html" aria-label="ホーム">
+          <div class="brand-mark" aria-hidden="true">
+            <img src="assets/muscle-quest-icon-white.png" alt="">
           </div>
-        </div>
+          <div>
+            <strong>Muscle Quest</strong>
+            <span>みんなで筋トレ習慣化</span>
+          </div>
+        </a>
         <div class="top-actions">
-          <span class="user-chip" id="userChip">未ログイン</span>
-          <button class="icon-btn hidden" type="button" id="logoutBtn" title="ログアウト">⎋</button>
-          <a class="back-link" href="ranking.html">ランキング</a>
-          <a class="back-link" href="index.html">ホームへ</a>
+          <span class="user-chip" id="userChip">
+            <span class="user-chip-main">
+              <span id="userChipName">未ログイン</span>
+              <button class="header-edit-link hidden" type="button" id="editNicknameLink">編集</button>
+            </span>
+            <span class="user-chip-meta hidden" id="userChipMeta"></span>
+          </span>
+          <button class="icon-btn menu-toggle" type="button" id="menuBtn" aria-controls="mobileMenu" aria-expanded="false" aria-label="メニュー">☰</button>
         </div>
       </div>
+      <nav class="mobile-menu" id="mobileMenu" aria-label="スマホメニュー" data-menu-auth="true"></nav>
     </header>
 
     <section class="auth-panel" id="authPanel">
       <div>
-        <h2>仮ログイン</h2>
-        <p>写真記録は本人だけが見られます。名前を入れて専用の写真タイムラインを開きます。</p>
+        <h2 id="authTitle">LINEログイン</h2>
+        <p id="authCopy">LINEでログイン後、写真記録用のニックネームを設定します。</p>
       </div>
-      <form class="auth-form" id="loginForm">
-        <input id="loginName" maxlength="32" placeholder="名前を入力" value="優大">
-        <button class="primary-btn" type="submit">はじめる</button>
+      <div id="lineLoginStep">
+        <button class="line-login-btn" type="button" id="lineLoginBtn">LINEログイン</button>
+        <span class="auth-note">ローカルでは仮LINEログインとして動きます。</span>
+      </div>
+      <form class="auth-form hidden" id="nicknameForm">
+        <input id="nicknameInput" maxlength="32" placeholder="ニックネームを入力">
+        <button class="primary-btn" type="submit">設定して始める</button>
       </form>
     </section>
 
@@ -537,10 +707,20 @@
 
   <div class="toast" id="toast"></div>
 
+  <script src="assets/shared-menu.js"></script>
   <script>
     (() => {
-      const state = { records:[], order:"desc", pendingImage:null, currentUser:null };
+      const state = {
+        records:[],
+        order:"desc",
+        pendingImage:null,
+        currentUser:null,
+        ranking:[],
+        needsNickname:new URLSearchParams(location.search).get("nickname") === "1",
+        nicknameReview:false
+      };
       const $ = id => document.getElementById(id);
+      const fmt = n => Number(n || 0).toLocaleString("ja-JP");
 
       function todayISO() {
         const date = new Date();
@@ -573,24 +753,85 @@
       function isLoggedIn() {
         return Boolean(state.currentUser);
       }
+      function hasRegisteredNickname(user) {
+        return Boolean(user?.publicName && user.publicName !== "LINEユーザー");
+      }
+      function currentRankingItem() {
+        return state.ranking.find(item => item.isCurrent) || state.ranking.find(item => item.userId === state.currentUser?.id) || null;
+      }
+      function headerRankClass(item) {
+        if (!item) return "";
+        if (item.rank === 1) return "rank-gold";
+        if (item.rank === 2) return "rank-silver";
+        if (item.rank === 3) return "rank-bronze";
+        return "";
+      }
+      function renderHeaderMeta(nicknameStep) {
+        const meta = $("userChipMeta");
+        const item = currentRankingItem();
+        const show = isLoggedIn() && item && (!nicknameStep || hasRegisteredNickname(state.currentUser));
+        meta.className = `user-chip-meta ${show ? headerRankClass(item) : "hidden"}`.trim();
+        meta.textContent = show ? `Lv.${item.level} / ${fmt(item.points)}pt / ${item.rank}位` : "";
+      }
+      function lineDemoKey() {
+        const key = localStorage.getItem("ymqLineDemoKey") || `line-${crypto.randomUUID()}`;
+        localStorage.setItem("ymqLineDemoKey", key);
+        return key;
+      }
       function renderAuth() {
-        $("authPanel").classList.toggle("hidden", isLoggedIn());
+        const nicknameStep = isLoggedIn() && state.needsNickname;
+        const canToggleNickname = isLoggedIn() && (!nicknameStep || hasRegisteredNickname(state.currentUser));
+        $("authPanel").classList.toggle("hidden", isLoggedIn() && !nicknameStep);
+        $("lineLoginStep").classList.toggle("hidden", isLoggedIn());
+        $("nicknameForm").classList.toggle("hidden", !nicknameStep);
+        $("authTitle").textContent = nicknameStep
+          ? hasRegisteredNickname(state.currentUser) ? "ニックネーム編集" : "ニックネーム設定"
+          : "LINEログイン";
+        $("authCopy").textContent = nicknameStep
+          ? hasRegisteredNickname(state.currentUser)
+            ? "写真記録とランキングに表示するニックネームを変更できます。"
+            : "写真記録とランキングに表示するニックネームを設定してください。"
+          : "LINEでログイン後、写真記録用のニックネームを設定します。";
         $("logoutBtn").classList.toggle("hidden", !isLoggedIn());
-        $("userChip").textContent = isLoggedIn() ? `${state.currentUser.publicName}でログイン中` : "未ログイン";
-        $("photoForm").querySelectorAll("input,textarea,button").forEach(input => { input.disabled = !isLoggedIn(); });
+        $("editNicknameLink").classList.toggle("hidden", !canToggleNickname);
+        $("editNicknameLink").textContent = nicknameStep ? "×とじる" : "編集";
+        $("userChipName").textContent = isLoggedIn() ? `${state.currentUser.publicName}さん` : "未ログイン";
+        renderHeaderMeta(nicknameStep);
+        $("photoForm").querySelectorAll("input,textarea,button").forEach(input => { input.disabled = !isLoggedIn() || state.needsNickname; });
+      }
+      async function loadHeaderRanking() {
+        if (!isLoggedIn() || state.needsNickname) {
+          state.ranking = [];
+          return;
+        }
+        try {
+          const data = await apiJson("/api/rankings");
+          state.ranking = Array.isArray(data.ranking) ? data.ranking : [];
+        } catch {
+          state.ranking = [];
+        }
       }
       async function loadMe() {
         try {
           const data = await apiJson("/api/auth/me");
           state.currentUser = data.user || null;
+          if (state.currentUser && state.needsNickname && hasRegisteredNickname(state.currentUser)) {
+            state.needsNickname = false;
+            history.replaceState(null, "", location.pathname + location.hash);
+          }
+          if (state.currentUser && !state.needsNickname) await loadHeaderRanking();
           renderAuth();
           if (state.currentUser) await loadRecords();
           else {
+            state.nicknameReview = false;
+            state.ranking = [];
             state.records = [];
             renderTimeline();
           }
         } catch {
           state.currentUser = null;
+          state.nicknameReview = false;
+          state.ranking = [];
           state.records = [];
           renderAuth();
           renderTimeline();
@@ -824,35 +1065,141 @@
           toast("削除できませんでした。通信を確認してください");
         }
       });
-      $("loginForm").addEventListener("submit", async event => {
-        event.preventDefault();
-        const name = $("loginName").value.trim();
-        if (!name) {
-          toast("名前を入力してください");
-          return;
-        }
-        const btn = event.submitter || $("loginForm").querySelector("button");
+      async function beginLineLogin() {
+        const btn = $("lineLoginBtn");
         btn.disabled = true;
         try {
+          const start = await fetch(`/api/auth/line/start?returnTo=${encodeURIComponent(location.pathname + location.search)}`, {
+            headers:{ "accept":"application/json" }
+          });
+          if (start.ok) {
+            const data = await start.json();
+            if (data.authUrl) {
+              location.href = data.authUrl;
+              return;
+            }
+          }
           const data = await apiJson("/api/auth/demo-login", {
             method:"POST",
-            body:JSON.stringify({ displayName:name })
+            body:JSON.stringify({
+              displayName:"LINEユーザー",
+              publicName:"LINEユーザー",
+              demoKey:lineDemoKey(),
+              needsNickname:true
+            })
           });
           state.currentUser = data.user;
-          toast(`${data.user.publicName}でログインしました`);
+          state.needsNickname = !hasRegisteredNickname(data.user);
+          state.records = [];
+          $("nicknameInput").value = data.user.publicName === "LINEユーザー" ? "" : data.user.publicName;
+          toast(state.needsNickname ? "LINEログインしました。ニックネームを設定してください" : "LINEログインしました");
+          if (!state.needsNickname) await loadHeaderRanking();
           renderAuth();
-          await loadRecords();
+          renderTimeline();
         } catch {
-          toast("ログインできませんでした");
+          toast("LINEログインを開始できませんでした");
         } finally {
           btn.disabled = false;
         }
+      }
+      async function saveNickname(event) {
+        event.preventDefault();
+        const nickname = $("nicknameInput").value.trim();
+        if (!nickname) {
+          toast("ニックネームを入力してください");
+          return;
+        }
+        const btn = event.submitter || $("nicknameForm").querySelector("button");
+        btn.disabled = true;
+        try {
+          const data = await apiJson("/api/auth/nickname", {
+            method:"POST",
+            body:JSON.stringify({ nickname })
+          });
+          state.currentUser = data.user;
+          state.needsNickname = false;
+          state.nicknameReview = false;
+          history.replaceState(null, "", location.pathname + location.hash);
+          toast(`${data.user.publicName}で開始します`);
+          await loadHeaderRanking();
+          renderAuth();
+          await loadRecords();
+        } catch {
+          toast("ニックネームを設定できませんでした");
+        } finally {
+          btn.disabled = false;
+        }
+      }
+      function editNickname() {
+        if (!isLoggedIn()) return;
+        if (state.needsNickname && hasRegisteredNickname(state.currentUser)) {
+          state.needsNickname = false;
+          renderAuth();
+          return;
+        }
+        state.needsNickname = true;
+        $("nicknameInput").value = state.currentUser.publicName === "LINEユーザー" ? "" : state.currentUser.publicName;
+        renderAuth();
+      }
+      $("lineLoginBtn").addEventListener("click", beginLineLogin);
+      $("nicknameForm").addEventListener("submit", saveNickname);
+      $("editNicknameLink").addEventListener("click", editNickname);
+      function closeMobileMenu() {
+        $("mobileMenu").classList.remove("open");
+        document.body.classList.remove("menu-open");
+        $("menuBtn").setAttribute("aria-expanded", "false");
+      }
+      function openMobileMenu() {
+        $("mobileMenu").classList.add("open");
+        document.body.classList.add("menu-open");
+        $("menuBtn").setAttribute("aria-expanded", "true");
+      }
+      $("menuBtn").addEventListener("click", event => {
+        event.stopPropagation();
+        const open = !$("mobileMenu").classList.contains("open");
+        if (open) openMobileMenu();
+        else closeMobileMenu();
+      });
+      document.addEventListener("click", event => {
+        if (!$("mobileMenu").classList.contains("open")) return;
+        if (event.target.closest("#mobileMenu") || event.target.closest("#menuBtn")) return;
+        closeMobileMenu();
+      });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape") closeMobileMenu();
+      });
+      $("mobileMenu").addEventListener("click", event => {
+        if (event.target.closest("a,button")) closeMobileMenu();
+      });
+      let menuTouchStartX = 0;
+      let menuTouchStartY = 0;
+      let menuTouchLastX = 0;
+      let menuTouchLastY = 0;
+      $("mobileMenu").addEventListener("touchstart", event => {
+        const touch = event.touches[0];
+        menuTouchStartX = touch.clientX;
+        menuTouchStartY = touch.clientY;
+        menuTouchLastX = touch.clientX;
+        menuTouchLastY = touch.clientY;
+      }, { passive:true });
+      $("mobileMenu").addEventListener("touchmove", event => {
+        const touch = event.touches[0];
+        menuTouchLastX = touch.clientX;
+        menuTouchLastY = touch.clientY;
+      }, { passive:true });
+      $("mobileMenu").addEventListener("touchend", () => {
+        const deltaX = menuTouchLastX - menuTouchStartX;
+        const deltaY = Math.abs(menuTouchLastY - menuTouchStartY);
+        if (deltaX > 60 && deltaY < 80) closeMobileMenu();
       });
       $("logoutBtn").addEventListener("click", async () => {
         try {
           await apiJson("/api/auth/logout", { method:"POST", body:"{}" });
         } catch {}
         state.currentUser = null;
+        state.needsNickname = false;
+        state.nicknameReview = false;
+        state.ranking = [];
         state.records = [];
         toast("ログアウトしました");
         renderTimeline();
