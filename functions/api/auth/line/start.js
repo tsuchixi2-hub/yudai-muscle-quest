@@ -19,7 +19,7 @@ export async function onRequestGet({ request, env }) {
   lineUrl.searchParams.set("state", state);
   lineUrl.searchParams.set("scope", "openid profile");
   lineUrl.searchParams.set("nonce", nonce);
-  if (/Android/i.test(request.headers.get("user-agent") || "")) {
+  if (url.searchParams.get("mode") === "web") {
     lineUrl.searchParams.set("disable_auto_login", "true");
   }
 
