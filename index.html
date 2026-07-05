@@ -2392,8 +2392,14 @@
       async function beginLineLogin() {
         const btn = $("lineLoginBtn");
         btn.disabled = true;
+        const startPath = `/api/auth/line/start?returnTo=${encodeURIComponent(location.pathname + location.search)}`;
+        const isLocal = ["localhost", "127.0.0.1"].includes(location.hostname);
+        if (!isLocal) {
+          location.assign(startPath);
+          return;
+        }
         try {
-          const start = await fetch(`/api/auth/line/start?returnTo=${encodeURIComponent(location.pathname + location.search)}`, {
+          const start = await fetch(startPath, {
             headers:{ "accept":"application/json" }
           });
           if (start.ok) {
