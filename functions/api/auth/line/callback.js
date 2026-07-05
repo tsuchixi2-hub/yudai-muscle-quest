@@ -1,4 +1,16 @@
-import { clearCookie, createSession, json, normalizeUser, parseCookies, sessionCookie } from "../../_auth.js";
+import { clearCookie, createSession, json, normalizeUser, parseCookies, sessionCookie, temporaryCookie } from "../../_auth.js";
+
+function redirectToLineRetry(url, returnTo, request) {
+  const retryUrl = new URL("/api/auth/line/start", url.origin);
+  retryUrl.searchParams.set("returnTo", returnTo || "/");
+  retryUrl.searchParams.set("mode", "web");
+  const headers = new Headers({ "location":retryUrl.pathname + retryUrl.search });
+  headers.append("set-cookie", clearCookie("ymq_line_state", request));
+  headers.append("set-cookie", clearCookie("ymq_line_verifier", request));
+  headers.append("set-cookie", clearCookie("ymq_line_return", request));
+  headers.append("set-cookie", temporaryCookie("ymq_line_retry", "1", 600, request));
+  return new Response(null, { status:302, headers });
+}
 
 export async function onRequestGet({ request, env }) {
   if (!env.LINE_CHANNEL_ID || !env.LINE_CHANNEL_SECRET || !env.LINE_CALLBACK_URL) {
@@ -12,7 +24,13 @@ export async function onRequestGet({ request, env }) {
   const code = url.searchParams.get("code");
   const state = url.searchParams.get("state");
   const cookies = parseCookies(request);
-  if (!code || !state || state !== cookies.ymq_line_state) return json({ error:"invalid_line_state" }, 400);
+  const returnTo = cookies.ymq_line_return || "/";
+  if (!code || !state || state !== cookies.ymq_line_state) {
+    if (code && state && cookies.ymq_line_retry !== "1") {
+      return redirectToLineRetry(url, returnTo, request);
+    }
+    return json({ error:"invalid_line_state" }, 400);
+  }
 
   const tokenBody = new URLSearchParams();
   tokenBody.set("grant_type", "authorization_code");
@@ -20,13 +38,21 @@ export async function onRequestGet({ request, env }) {
   tokenBody.set("redirect_uri", env.LINE_CALLBACK_URL);
   tokenBody.set("client_id", env.LINE_CHANNEL_ID);
   tokenBody.set("client_secret", env.LINE_CHANNEL_SECRET);
+  if (cookies.ymq_line_verifier) {
+    tokenBody.set("code_verifier", cookies.ymq_line_verifier);
+  }
 
   const tokenResponse = await fetch("https://api.line.me/oauth2/v2.1/token", {
     method:"POST",
     headers:{ "content-type":"application/x-www-form-urlencoded" },
     body:tokenBody
   });
-  if (!tokenResponse.ok) return json({ error:"line_token_failed" }, 502);
+  if (!tokenResponse.ok) {
+    if (cookies.ymq_line_retry !== "1") {
+      return redirectToLineRetry(url, returnTo, request);
+    }
+    return json({ error:"line_token_failed" }, 502);
+  }
   const token = await tokenResponse.json();
 
   const profileResponse = await fetch("https://api.line.me/v2/profile", {
@@ -65,13 +91,14 @@ export async function onRequestGet({ request, env }) {
   }
 
   const session = await createSession(env, user.id);
-  const returnTo = cookies.ymq_line_return || "/";
   const redirectUrl = new URL(returnTo, url.origin);
   redirectUrl.searchParams.set("nickname", "1");
 
   const headers = new Headers({ "location":redirectUrl.pathname + redirectUrl.search + redirectUrl.hash });
   headers.append("set-cookie", sessionCookie(session.id, session.expiresAt, request));
   headers.append("set-cookie", clearCookie("ymq_line_state", request));
+  headers.append("set-cookie", clearCookie("ymq_line_verifier", request));
   headers.append("set-cookie", clearCookie("ymq_line_return", request));
+  headers.append("set-cookie", clearCookie("ymq_line_retry", request));
   return new Response(null, { status:302, headers });
 }
