@@ -270,6 +270,19 @@
       font-weight:800;
       text-align:center;
     }
+    .line-web-login-link {
+      display:block;
+      margin:8px auto 0;
+      padding:0;
+      border:0;
+      color:var(--muted);
+      background:transparent;
+      font-size:11px;
+      font-weight:900;
+      text-decoration:underline;
+      text-underline-offset:3px;
+    }
+    .line-web-login-link:hover { color:var(--coal); }
     .logout-link {
       min-height:40px;
       padding:0;
@@ -1108,7 +1121,8 @@
         <p id="authCopy">ニックネームを設定して、自分専用の記録を始めます。</p>
       </div>
       <div id="lineLoginStep">
-        <button class="line-login-btn" type="button" id="lineLoginBtn">LINEログイン</button>
+        <button class="line-login-btn" type="button" id="lineLoginBtn">LINEアプリでログイン</button>
+        <button class="line-web-login-link hidden" type="button" id="lineWebLoginBtn">Androidでエラーが出る場合はWebログインで続ける</button>
         <span class="auth-note">ローカルでは仮LINEログインとして動きます。</span>
       </div>
       <form class="auth-form hidden" id="nicknameForm">
@@ -2264,6 +2278,7 @@
         const canToggleNickname = isLoggedIn() && (!nicknameStep || hasRegisteredNickname(state.currentUser));
         $("authPanel").classList.toggle("hidden", isLoggedIn() && !nicknameStep);
         $("lineLoginStep").classList.toggle("hidden", isLoggedIn());
+        $("lineWebLoginBtn").classList.toggle("hidden", !/Android/i.test(navigator.userAgent || ""));
         $("nicknameForm").classList.toggle("hidden", !nicknameStep);
         $("authTitle").textContent = nicknameStep
           ? hasRegisteredNickname(state.currentUser) ? "ニックネーム編集" : "ニックネーム設定"
@@ -2389,10 +2404,12 @@
         state.activePhoto = (state.activePhoto + 1) % musclePhotos.length;
         renderPhotoSlider();
       });
-      async function beginLineLogin() {
-        const btn = $("lineLoginBtn");
+      async function beginLineLogin(mode = "app") {
+        const btn = mode === "web" ? $("lineWebLoginBtn") : $("lineLoginBtn");
         btn.disabled = true;
-        const startPath = `/api/auth/line/start?returnTo=${encodeURIComponent(location.pathname + location.search)}`;
+        const startParams = new URLSearchParams({ returnTo:location.pathname + location.search });
+        if (mode === "web") startParams.set("mode", "web");
+        const startPath = `/api/auth/line/start?${startParams.toString()}`;
         const isLocal = ["localhost", "127.0.0.1"].includes(location.hostname);
         if (!isLocal) {
           location.assign(startPath);
@@ -2482,7 +2499,8 @@
         $("nicknameInput").value = state.currentUser.publicName === "LINEユーザー" ? "" : state.currentUser.publicName;
         render();
       }
-      $("lineLoginBtn").addEventListener("click", beginLineLogin);
+      $("lineLoginBtn").addEventListener("click", () => beginLineLogin("app"));
+      $("lineWebLoginBtn").addEventListener("click", () => beginLineLogin("web"));
       $("nicknameForm").addEventListener("submit", saveNickname);
       $("editNicknameLink").addEventListener("click", editNickname);
       $("logoutBtn").addEventListener("click", async () => {
