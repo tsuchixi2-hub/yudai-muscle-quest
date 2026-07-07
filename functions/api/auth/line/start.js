@@ -1,4 +1,4 @@
-import { clearCookie, json, jsonHeaders, temporaryCookie } from "../../_auth.js";
+import { clearCookie, json, jsonHeaders, logAuthEvent, temporaryCookie } from "../../_auth.js";
 
 function base64Url(bytes) {
   let binary = "";
@@ -14,7 +14,7 @@ async function createPkcePair() {
   return { verifier, challenge:base64Url(new Uint8Array(digest)) };
 }
 
-export async function onRequestGet({ request, env }) {
+export async function onRequestGet({ request, env, waitUntil }) {
   if (!env.LINE_CHANNEL_ID || !env.LINE_CALLBACK_URL) {
     return json({
       error:"line_not_configured",
@@ -27,6 +27,9 @@ export async function onRequestGet({ request, env }) {
   const state = crypto.randomUUID();
   const nonce = crypto.randomUUID();
   const pkce = await createPkcePair();
+  const ua = request.headers.get("user-agent") || "";
+  const isAndroid = /Android/i.test(ua);
+  const mode = url.searchParams.get("mode");
   const lineUrl = new URL("https://access.line.me/oauth2/v2.1/authorize");
   lineUrl.searchParams.set("response_type", "code");
   lineUrl.searchParams.set("client_id", env.LINE_CHANNEL_ID);
@@ -36,8 +39,20 @@ export async function onRequestGet({ request, env }) {
   lineUrl.searchParams.set("nonce", nonce);
   lineUrl.searchParams.set("code_challenge", pkce.challenge);
   lineUrl.searchParams.set("code_challenge_method", "S256");
-  if (url.searchParams.get("mode") === "web") {
+  if (mode === "web" || (isAndroid && mode !== "app")) {
     lineUrl.searchParams.set("disable_auto_login", "true");
+  }
+
+  const logDetail = JSON.stringify({
+    mode:mode || "",
+    android:isAndroid,
+    disableAutoLogin:lineUrl.searchParams.get("disable_auto_login") === "true"
+  });
+  const logPromise = logAuthEvent(env, "start", logDetail, request);
+  if (typeof waitUntil === "function") {
+    waitUntil(logPromise);
+  } else {
+    await logPromise;
   }
 
   if ((request.headers.get("accept") || "").includes("application/json")) {

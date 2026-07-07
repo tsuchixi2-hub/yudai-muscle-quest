@@ -59,3 +59,12 @@ CREATE INDEX IF NOT EXISTS idx_photo_records_public_date ON photo_records(is_pub
 
 INSERT OR IGNORE INTO users (id, line_user_id, demo_key, display_name, public_name, picture_url, created_at, updated_at)
 VALUES ('user-yudai', NULL, 'demo:yudai', '優大', '優大', '', datetime('now'), datetime('now'));
+
+CREATE TABLE IF NOT EXISTS auth_events (
+  id TEXT PRIMARY KEY,
+  stage TEXT NOT NULL,
+  detail TEXT NOT NULL DEFAULT '',
+  user_agent TEXT NOT NULL DEFAULT '',
+  created_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_auth_events_created ON auth_events(created_at);

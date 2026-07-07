@@ -106,3 +106,60 @@ export function demoKeyFor(name) {
   if (name === "優大" || name.toLowerCase() === "yudai") return "demo:yudai";
   return `demo:${name.toLowerCase()}`;
 }
+
+function escapeHtml(value) {
+  return String(value || "").replace(/[&<>"']/g, char => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  }[char]));
+}
+
+export function authErrorPage(request, { title, message, returnTo, code, status = 400 }) {
+  const url = new URL(request.url);
+  const safeReturnTo = returnTo || "/";
+  const retryUrl = `/api/auth/line/start?mode=web&returnTo=${encodeURIComponent(safeReturnTo)}`;
+  const html = `<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>${escapeHtml(title)}</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif; background:#f5f5f7; color:#1c1c1e; margin:0; padding:24px 16px; display:flex; align-items:center; justify-content:center; min-height:100vh; box-sizing:border-box; }
+  .card { background:#fff; border-radius:16px; padding:28px 24px; max-width:420px; width:100%; box-shadow:0 2px 12px rgba(0,0,0,0.08); text-align:center; }
+  h1 { font-size:18px; margin:0 0 12px; }
+  p { font-size:14px; line-height:1.6; color:#3a3a3c; margin:0 0 20px; }
+  a.button { display:block; background:#06c755; color:#fff; text-decoration:none; font-weight:bold; padding:12px 16px; border-radius:10px; margin-bottom:12px; }
+  a.link { display:block; color:#636366; text-decoration:none; font-size:13px; margin-bottom:16px; }
+  .code { font-size:11px; color:#aeaeb2; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>${escapeHtml(title)}</h1>
+    <p>${escapeHtml(message)}</p>
+    <a class="button" href="${retryUrl}">LINEのWeb画面でログインをやり直す</a>
+    <a class="link" href="/">トップへ戻る</a>
+    <div class="code">${escapeHtml(code || "")}</div>
+  </div>
+</body>
+</html>`;
+  return new Response(html, {
+    status,
+    headers:{ "content-type":"text/html; charset=utf-8", "cache-control":"no-store" }
+  });
+}
+
+export async function logAuthEvent(env, stage, detail, request) {
+  try {
+    if (!env.DB) return;
+    const id = crypto.randomUUID();
+    const userAgent = (request && request.headers.get("user-agent")) || "";
+    const createdAt = new Date().toISOString();
+    await env.DB.prepare(
+      `INSERT INTO auth_events (id, stage, detail, user_agent, created_at)
+       VALUES (?, ?, ?, ?, ?)`
+    ).bind(id, stage, detail || "", userAgent, createdAt).run();
+  } catch (err) {
+    // ログ失敗が認証フローを壊さないようにする
+  }
+}

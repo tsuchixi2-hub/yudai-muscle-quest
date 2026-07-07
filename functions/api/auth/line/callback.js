@@ -1,4 +1,4 @@
-import { clearCookie, createSession, json, normalizeUser, parseCookies, sessionCookie, temporaryCookie } from "../../_auth.js";
+import { authErrorPage, clearCookie, createSession, getSessionUser, json, logAuthEvent, normalizeUser, parseCookies, sessionCookie, temporaryCookie } from "../../_auth.js";
 
 function redirectToLineRetry(url, returnTo, request) {
   const retryUrl = new URL("/api/auth/line/start", url.origin);
@@ -12,7 +12,16 @@ function redirectToLineRetry(url, returnTo, request) {
   return new Response(null, { status:302, headers });
 }
 
-export async function onRequestGet({ request, env }) {
+export async function onRequestGet({ request, env, waitUntil }) {
+  function log(stage, detail) {
+    const logPromise = logAuthEvent(env, stage, detail || "", request);
+    if (typeof waitUntil === "function") {
+      waitUntil(logPromise);
+      return Promise.resolve();
+    }
+    return logPromise;
+  }
+
   if (!env.LINE_CHANNEL_ID || !env.LINE_CHANNEL_SECRET || !env.LINE_CALLBACK_URL) {
     return json({
       error:"line_not_configured",
@@ -25,11 +34,31 @@ export async function onRequestGet({ request, env }) {
   const state = url.searchParams.get("state");
   const cookies = parseCookies(request);
   const returnTo = cookies.ymq_line_return || "/";
+
   if (!code || !state || state !== cookies.ymq_line_state) {
+    // 既に有効なセッションがある場合（二重実行・戻る操作等）はエラーにせずそのまま戻す
+    const existingUser = await getSessionUser(request, env);
+    if (existingUser) {
+      await log("callback_already_logged_in", "");
+      const redirectUrl = new URL(returnTo, url.origin);
+      return new Response(null, {
+        status:302,
+        headers:{ "location":redirectUrl.pathname + redirectUrl.search + redirectUrl.hash }
+      });
+    }
+
     if (code && state && cookies.ymq_line_retry !== "1") {
+      await log("callback_retry", "state_mismatch");
       return redirectToLineRetry(url, returnTo, request);
     }
-    return json({ error:"invalid_line_state" }, 400);
+    await log("callback_state_mismatch", "");
+    return authErrorPage(request, {
+      title:"ログインに失敗しました",
+      message:"LINEログインの認証情報を確認できませんでした。お手数ですが、もう一度ログインをお試しください。",
+      returnTo,
+      code:"invalid_line_state",
+      status:400
+    });
   }
 
   const tokenBody = new URLSearchParams();
@@ -49,18 +78,44 @@ export async function onRequestGet({ request, env }) {
   });
   if (!tokenResponse.ok) {
     if (cookies.ymq_line_retry !== "1") {
+      await log("callback_retry", "token_failed");
       return redirectToLineRetry(url, returnTo, request);
     }
-    return json({ error:"line_token_failed" }, 502);
+    await log("callback_token_failed", "");
+    return authErrorPage(request, {
+      title:"ログインに失敗しました",
+      message:"LINEとの通信でエラーが発生しました。時間をおいて再度お試しいただくか、Web画面からのログインをお試しください。",
+      returnTo,
+      code:"line_token_failed",
+      status:502
+    });
   }
   const token = await tokenResponse.json();
 
   const profileResponse = await fetch("https://api.line.me/v2/profile", {
     headers:{ "authorization":`Bearer ${token.access_token}` }
   });
-  if (!profileResponse.ok) return json({ error:"line_profile_failed" }, 502);
+  if (!profileResponse.ok) {
+    await log("callback_profile_failed", "profile_failed");
+    return authErrorPage(request, {
+      title:"ログインに失敗しました",
+      message:"LINEのプロフィール情報を取得できませんでした。時間をおいて再度お試しください。",
+      returnTo,
+      code:"line_profile_failed",
+      status:502
+    });
+  }
   const profile = await profileResponse.json();
-  if (!profile.userId) return json({ error:"line_profile_missing" }, 502);
+  if (!profile.userId) {
+    await log("callback_profile_failed", "profile_missing");
+    return authErrorPage(request, {
+      title:"ログインに失敗しました",
+      message:"LINEのプロフィール情報を取得できませんでした。時間をおいて再度お試しください。",
+      returnTo,
+      code:"line_profile_missing",
+      status:502
+    });
+  }
 
   const now = new Date().toISOString();
   let user = await env.DB.prepare(
@@ -93,6 +148,8 @@ export async function onRequestGet({ request, env }) {
   const session = await createSession(env, user.id);
   const redirectUrl = new URL(returnTo, url.origin);
   redirectUrl.searchParams.set("nickname", "1");
+
+  await log("callback_ok", "");
 
   const headers = new Headers({ "location":redirectUrl.pathname + redirectUrl.search + redirectUrl.hash });
   headers.append("set-cookie", sessionCookie(session.id, session.expiresAt, request));
