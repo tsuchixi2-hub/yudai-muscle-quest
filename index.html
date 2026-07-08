@@ -271,6 +271,16 @@
       font-weight:800;
       text-align:center;
     }
+    .line-web-login-link {
+      display:block;
+      margin-top:8px;
+      color:var(--muted);
+      font-size:11px;
+      font-weight:700;
+      text-align:center;
+      text-decoration:underline;
+      text-underline-offset:2px;
+    }
     .logout-link {
       min-height:40px;
       padding:0;
@@ -1110,6 +1120,7 @@
       </div>
       <div id="lineLoginStep">
         <a class="line-login-btn" href="/api/auth/line/start?returnTo=%2F" id="lineLoginBtn">LINEログイン</a>
+        <a class="line-web-login-link hidden" href="/api/auth/line/start?returnTo=%2F&mode=web" id="lineWebLoginLink">LINEアプリが開かない場合はWebでログイン</a>
         <span class="auth-note">ローカルでは仮LINEログインとして動きます。</span>
       </div>
       <form class="auth-form hidden" id="nicknameForm">
@@ -2265,7 +2276,14 @@
         const canToggleNickname = isLoggedIn() && (!nicknameStep || hasRegisteredNickname(state.currentUser));
         $("authPanel").classList.toggle("hidden", isLoggedIn() && !nicknameStep);
         $("lineLoginStep").classList.toggle("hidden", isLoggedIn());
-        $("lineLoginBtn").href = `/api/auth/line/start?${new URLSearchParams({ returnTo:location.pathname + location.search }).toString()}`;
+        const uaAndroid = /Android/i.test(navigator.userAgent);
+        const uaLineInApp = /\bLine\//i.test(navigator.userAgent);
+        const loginParams = new URLSearchParams({ returnTo:location.pathname + location.search });
+        if (uaAndroid && !uaLineInApp) loginParams.set("mode", "app");
+        $("lineLoginBtn").href = `/api/auth/line/start?${loginParams.toString()}`;
+        const webParams = new URLSearchParams({ returnTo:location.pathname + location.search, mode:"web" });
+        $("lineWebLoginLink").href = `/api/auth/line/start?${webParams.toString()}`;
+        $("lineWebLoginLink").classList.toggle("hidden", !(uaAndroid && !uaLineInApp) || isLoggedIn());
         $("nicknameForm").classList.toggle("hidden", !nicknameStep);
         $("authTitle").textContent = nicknameStep
           ? hasRegisteredNickname(state.currentUser) ? "ニックネーム編集" : "ニックネーム設定"

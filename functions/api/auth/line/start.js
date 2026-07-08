@@ -29,6 +29,7 @@ export async function onRequestGet({ request, env, waitUntil }) {
   const pkce = await createPkcePair();
   const ua = request.headers.get("user-agent") || "";
   const isAndroid = /Android/i.test(ua);
+  const isLineInApp = /\bLine\//i.test(ua);
   const mode = url.searchParams.get("mode");
   const lineUrl = new URL("https://access.line.me/oauth2/v2.1/authorize");
   lineUrl.searchParams.set("response_type", "code");
@@ -39,13 +40,16 @@ export async function onRequestGet({ request, env, waitUntil }) {
   lineUrl.searchParams.set("nonce", nonce);
   lineUrl.searchParams.set("code_challenge", pkce.challenge);
   lineUrl.searchParams.set("code_challenge_method", "S256");
-  if (mode === "web" || (isAndroid && mode !== "app")) {
+  // LINEアプリ内ブラウザは auto login が最も安定するため無効化しない。
+  // Android の通常ブラウザは既定で Web ログイン（安全側）。mode=app でアプリ起動を試せる。
+  if (mode === "web" || (isAndroid && !isLineInApp && mode !== "app")) {
     lineUrl.searchParams.set("disable_auto_login", "true");
   }
 
   const logDetail = JSON.stringify({
     mode:mode || "",
     android:isAndroid,
+    lineInApp:isLineInApp,
     disableAutoLogin:lineUrl.searchParams.get("disable_auto_login") === "true"
   });
   const logPromise = logAuthEvent(env, "start", logDetail, request);
